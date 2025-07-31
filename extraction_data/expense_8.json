@@ -1,0 +1,83 @@
+{
+  "data": {
+    "type": "Expense",
+    "id": "8",
+    "attributes": {
+      "amount": 0.0,
+      "canceled": true,
+      "createdAt": "2019-12-30T14:12:53Z",
+      "date": "2019-12-30",
+      "description": null,
+      "dueDate": null,
+      "paymentDate": "2019-12-30",
+      "receiptNumber": "1",
+      "useInCashCount": true
+    },
+    "relationships": {
+      "cashRegister": {
+        "data": {
+          "type": "CashRegister",
+          "id": "1"
+        }
+      },
+      "expenseCategory": {
+        "data": null
+      },
+      "expenseItems": {
+        "data": []
+      },
+      "paymentMethod": {
+        "data": {
+          "type": "PaymentMethod",
+          "id": "1"
+        }
+      },
+      "provider": {
+        "data": {
+          "type": "Provider",
+          "id": "4"
+        }
+      },
+      "receiptType": {
+        "data": null
+      },
+      "user": {
+        "data": {
+          "type": "User",
+          "id": "1"
+        }
+      }
+    }
+  },
+  "included": [
+    {
+      "type": "CashRegister",
+      "id": "1",
+      "attributes": {
+        "name": "Principal"
+      }
+    },
+    {
+      "type": "PaymentMethod",
+      "id": "1",
+      "attributes": {
+        "code": "cash",
+        "name": "Efectivo"
+      }
+    },
+    {
+      "type": "Provider",
+      "id": "4",
+      "attributes": {
+        "name": "Mercado"
+      }
+    },
+    {
+      "type": "User",
+      "id": "1",
+      "attributes": {
+        "name": "Administrador"
+      }
+    }
+  ]
+}

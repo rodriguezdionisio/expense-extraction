@@ -72,7 +72,14 @@ def get_secret(secret_id: str) -> str:
         Valor del secreto como string.
     """
     try:
-        client = secretmanager.SecretManagerServiceClient()
+        if config.GOOGLE_APPLICATION_CREDENTIALS:
+            credentials = service_account.Credentials.from_service_account_file(config.GOOGLE_APPLICATION_CREDENTIALS)
+            client = secretmanager.SecretManagerServiceClient(credentials=credentials)
+            logger.info("Cliente de Secret Manager inicializado con archivo de credenciales.")
+        else:
+            client = secretmanager.SecretManagerServiceClient()
+            logger.info("Cliente de Secret Manager inicializado con Application Default Credentials (ADC).")
+        
         name = f"projects/{config.GCP_PROJECT_ID}/secrets/{secret_id}/versions/latest"
         response = client.access_secret_version(request={"name": name})
         logger.info(f"Secreto '{secret_id}' accedido correctamente.")

@@ -1,0 +1,2 @@
+expense_key,expense_amount,cancelled,expense_date_key,payment_date_key,due_date_key,created_date_key,created_time_key,expense_note,receipt_number,use_in_cash_count,cash_register_key,payment_method_key,provider_key,receipt_type_key,employee_key
+8,0.0,True,20191230,20191230,,20191230,1112,,1,True,1,1,4,0,1

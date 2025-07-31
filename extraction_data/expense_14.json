@@ -1,0 +1,170 @@
+{
+  "data": {
+    "type": "Expense",
+    "id": "14",
+    "attributes": {
+      "amount": 1815.0,
+      "canceled": null,
+      "createdAt": "2020-01-06T14:44:18Z",
+      "date": "2020-01-06",
+      "description": "Medialunas 180",
+      "dueDate": null,
+      "paymentDate": "2020-01-06",
+      "receiptNumber": "0",
+      "useInCashCount": true
+    },
+    "relationships": {
+      "cashRegister": {
+        "data": {
+          "type": "CashRegister",
+          "id": "1"
+        }
+      },
+      "expenseCategory": {
+        "data": {
+          "type": "ExpenseCategory",
+          "id": "3"
+        }
+      },
+      "expenseItems": {
+        "data": [
+          {
+            "type": "ExpenseItem",
+            "id": "30"
+          },
+          {
+            "type": "ExpenseItem",
+            "id": "5466"
+          }
+        ]
+      },
+      "paymentMethod": {
+        "data": {
+          "type": "PaymentMethod",
+          "id": "1"
+        }
+      },
+      "provider": {
+        "data": {
+          "type": "Provider",
+          "id": "37"
+        }
+      },
+      "receiptType": {
+        "data": {
+          "type": "ReceiptType",
+          "id": "1"
+        }
+      },
+      "user": {
+        "data": {
+          "type": "User",
+          "id": "1"
+        }
+      }
+    }
+  },
+  "included": [
+    {
+      "type": "CashRegister",
+      "id": "1",
+      "attributes": {
+        "name": "Principal"
+      }
+    },
+    {
+      "type": "ExpenseCategory",
+      "id": "3",
+      "attributes": {
+        "name": "Cafetería"
+      }
+    },
+    {
+      "type": "ExpenseItem",
+      "id": "30",
+      "attributes": {
+        "canceled": true,
+        "detail": "Medialunas",
+        "price": 0.0,
+        "quantity": 180.0
+      },
+      "relationships": {
+        "product": {
+          "data": null
+        },
+        "ingredient": {
+          "data": {
+            "type": "Ingredient",
+            "id": "29"
+          }
+        }
+      }
+    },
+    {
+      "type": "Ingredient",
+      "id": "29",
+      "attributes": {
+        "cost": 363.1,
+        "name": "Medialuna cruda"
+      },
+      "relationships": {
+        "unit": {
+          "data": {
+            "type": "Unit",
+            "id": "1"
+          }
+        }
+      }
+    },
+    {
+      "type": "ExpenseItem",
+      "id": "5466",
+      "attributes": {
+        "canceled": null,
+        "detail": "Medialunas",
+        "price": 1815.0,
+        "quantity": 180.0
+      },
+      "relationships": {
+        "product": {
+          "data": null
+        },
+        "ingredient": {
+          "data": {
+            "type": "Ingredient",
+            "id": "29"
+          }
+        }
+      }
+    },
+    {
+      "type": "PaymentMethod",
+      "id": "1",
+      "attributes": {
+        "code": "cash",
+        "name": "Efectivo"
+      }
+    },
+    {
+      "type": "Provider",
+      "id": "37",
+      "attributes": {
+        "name": "Compañía Comercial Andina S.R.L."
+      }
+    },
+    {
+      "type": "ReceiptType",
+      "id": "1",
+      "attributes": {
+        "name": "Factura A"
+      }
+    },
+    {
+      "type": "User",
+      "id": "1",
+      "attributes": {
+        "name": "Administrador"
+      }
+    }
+  ]
+}

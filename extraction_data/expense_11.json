@@ -1,0 +1,744 @@
+{
+  "data": {
+    "type": "Expense",
+    "id": "11",
+    "attributes": {
+      "amount": 23753.68,
+      "canceled": null,
+      "createdAt": "2020-01-04T16:06:24Z",
+      "date": "2020-01-04",
+      "description": null,
+      "dueDate": null,
+      "paymentDate": "2020-01-04",
+      "receiptNumber": "3420-00201279",
+      "useInCashCount": true
+    },
+    "relationships": {
+      "cashRegister": {
+        "data": {
+          "type": "CashRegister",
+          "id": "1"
+        }
+      },
+      "expenseCategory": {
+        "data": {
+          "type": "ExpenseCategory",
+          "id": "5"
+        }
+      },
+      "expenseItems": {
+        "data": [
+          {
+            "type": "ExpenseItem",
+            "id": "12"
+          },
+          {
+            "type": "ExpenseItem",
+            "id": "13"
+          },
+          {
+            "type": "ExpenseItem",
+            "id": "14"
+          },
+          {
+            "type": "ExpenseItem",
+            "id": "15"
+          },
+          {
+            "type": "ExpenseItem",
+            "id": "18"
+          },
+          {
+            "type": "ExpenseItem",
+            "id": "19"
+          },
+          {
+            "type": "ExpenseItem",
+            "id": "20"
+          },
+          {
+            "type": "ExpenseItem",
+            "id": "21"
+          },
+          {
+            "type": "ExpenseItem",
+            "id": "22"
+          },
+          {
+            "type": "ExpenseItem",
+            "id": "23"
+          },
+          {
+            "type": "ExpenseItem",
+            "id": "24"
+          },
+          {
+            "type": "ExpenseItem",
+            "id": "25"
+          },
+          {
+            "type": "ExpenseItem",
+            "id": "16"
+          },
+          {
+            "type": "ExpenseItem",
+            "id": "17"
+          },
+          {
+            "type": "ExpenseItem",
+            "id": "26"
+          },
+          {
+            "type": "ExpenseItem",
+            "id": "27"
+          }
+        ]
+      },
+      "paymentMethod": {
+        "data": {
+          "type": "PaymentMethod",
+          "id": "1"
+        }
+      },
+      "provider": {
+        "data": {
+          "type": "Provider",
+          "id": "3"
+        }
+      },
+      "receiptType": {
+        "data": {
+          "type": "ReceiptType",
+          "id": "1"
+        }
+      },
+      "user": {
+        "data": {
+          "type": "User",
+          "id": "1"
+        }
+      }
+    }
+  },
+  "included": [
+    {
+      "type": "CashRegister",
+      "id": "1",
+      "attributes": {
+        "name": "Principal"
+      }
+    },
+    {
+      "type": "ExpenseCategory",
+      "id": "5",
+      "attributes": {
+        "name": "Gaseosas"
+      }
+    },
+    {
+      "type": "ExpenseItem",
+      "id": "12",
+      "attributes": {
+        "canceled": null,
+        "detail": "Coca Cola",
+        "price": 0.0,
+        "quantity": 120.0
+      },
+      "relationships": {
+        "product": {
+          "data": {
+            "type": "Product",
+            "id": "1"
+          }
+        },
+        "ingredient": {
+          "data": null
+        }
+      }
+    },
+    {
+      "type": "Product",
+      "id": "1",
+      "attributes": {
+        "cost": null,
+        "name": "Coca Cola"
+      },
+      "relationships": {
+        "unit": {
+          "data": {
+            "type": "Unit",
+            "id": "1"
+          }
+        }
+      }
+    },
+    {
+      "type": "ExpenseItem",
+      "id": "13",
+      "attributes": {
+        "canceled": null,
+        "detail": "Coca Cola Zero",
+        "price": 0.0,
+        "quantity": 48.0
+      },
+      "relationships": {
+        "product": {
+          "data": {
+            "type": "Product",
+            "id": "210"
+          }
+        },
+        "ingredient": {
+          "data": null
+        }
+      }
+    },
+    {
+      "type": "Product",
+      "id": "210",
+      "attributes": {
+        "cost": 333.33,
+        "name": "Coca Cola Zero"
+      },
+      "relationships": {
+        "unit": {
+          "data": {
+            "type": "Unit",
+            "id": "1"
+          }
+        }
+      }
+    },
+    {
+      "type": "ExpenseItem",
+      "id": "14",
+      "attributes": {
+        "canceled": null,
+        "detail": "Sprite",
+        "price": 0.0,
+        "quantity": 72.0
+      },
+      "relationships": {
+        "product": {
+          "data": {
+            "type": "Product",
+            "id": "15"
+          }
+        },
+        "ingredient": {
+          "data": null
+        }
+      }
+    },
+    {
+      "type": "Product",
+      "id": "15",
+      "attributes": {
+        "cost": 36.85,
+        "name": "Sprite"
+      },
+      "relationships": {
+        "unit": {
+          "data": {
+            "type": "Unit",
+            "id": "1"
+          }
+        }
+      }
+    },
+    {
+      "type": "ExpenseItem",
+      "id": "15",
+      "attributes": {
+        "canceled": null,
+        "detail": "Heineken Porrón",
+        "price": 0.0,
+        "quantity": 24.0
+      },
+      "relationships": {
+        "product": {
+          "data": {
+            "type": "Product",
+            "id": "39"
+          }
+        },
+        "ingredient": {
+          "data": null
+        }
+      }
+    },
+    {
+      "type": "Product",
+      "id": "39",
+      "attributes": {
+        "cost": 1761.84,
+        "name": "Heineken Porron"
+      },
+      "relationships": {
+        "unit": {
+          "data": {
+            "type": "Unit",
+            "id": "1"
+          }
+        }
+      }
+    },
+    {
+      "type": "ExpenseItem",
+      "id": "18",
+      "attributes": {
+        "canceled": null,
+        "detail": "Imperial Lager Porrón",
+        "price": 0.0,
+        "quantity": 12.0
+      },
+      "relationships": {
+        "product": {
+          "data": {
+            "type": "Product",
+            "id": "34"
+          }
+        },
+        "ingredient": {
+          "data": null
+        }
+      }
+    },
+    {
+      "type": "Product",
+      "id": "34",
+      "attributes": {
+        "cost": 182.16,
+        "name": "Imperial Lager Porrón"
+      },
+      "relationships": {
+        "unit": {
+          "data": {
+            "type": "Unit",
+            "id": "1"
+          }
+        }
+      }
+    },
+    {
+      "type": "ExpenseItem",
+      "id": "19",
+      "attributes": {
+        "canceled": null,
+        "detail": "Imperial Lager 1L",
+        "price": 0.0,
+        "quantity": 24.0
+      },
+      "relationships": {
+        "product": {
+          "data": {
+            "type": "Product",
+            "id": "10"
+          }
+        },
+        "ingredient": {
+          "data": null
+        }
+      }
+    },
+    {
+      "type": "Product",
+      "id": "10",
+      "attributes": {
+        "cost": 2202.3,
+        "name": "Imperial Lager 1L"
+      },
+      "relationships": {
+        "unit": {
+          "data": {
+            "type": "Unit",
+            "id": "1"
+          }
+        }
+      }
+    },
+    {
+      "type": "ExpenseItem",
+      "id": "20",
+      "attributes": {
+        "canceled": null,
+        "detail": "Imperial Amber Lager 1L",
+        "price": 0.0,
+        "quantity": 12.0
+      },
+      "relationships": {
+        "product": {
+          "data": {
+            "type": "Product",
+            "id": "30"
+          }
+        },
+        "ingredient": {
+          "data": null
+        }
+      }
+    },
+    {
+      "type": "Product",
+      "id": "30",
+      "attributes": {
+        "cost": 313.0,
+        "name": "Imperial Amber 1L"
+      },
+      "relationships": {
+        "unit": {
+          "data": {
+            "type": "Unit",
+            "id": "1"
+          }
+        }
+      }
+    },
+    {
+      "type": "ExpenseItem",
+      "id": "21",
+      "attributes": {
+        "canceled": null,
+        "detail": "Imperial IPA 1L",
+        "price": 0.0,
+        "quantity": 12.0
+      },
+      "relationships": {
+        "product": {
+          "data": {
+            "type": "Product",
+            "id": "32"
+          }
+        },
+        "ingredient": {
+          "data": null
+        }
+      }
+    },
+    {
+      "type": "Product",
+      "id": "32",
+      "attributes": {
+        "cost": 519.33,
+        "name": "Imperial IPA 1L"
+      },
+      "relationships": {
+        "unit": {
+          "data": {
+            "type": "Unit",
+            "id": "1"
+          }
+        }
+      }
+    },
+    {
+      "type": "ExpenseItem",
+      "id": "22",
+      "attributes": {
+        "canceled": null,
+        "detail": "Aquarius Manzana",
+        "price": 0.0,
+        "quantity": 12.0
+      },
+      "relationships": {
+        "product": {
+          "data": {
+            "type": "Product",
+            "id": "23"
+          }
+        },
+        "ingredient": {
+          "data": null
+        }
+      }
+    },
+    {
+      "type": "Product",
+      "id": "23",
+      "attributes": {
+        "cost": 905.44,
+        "name": "Levite Manzana"
+      },
+      "relationships": {
+        "unit": {
+          "data": {
+            "type": "Unit",
+            "id": "1"
+          }
+        }
+      }
+    },
+    {
+      "type": "ExpenseItem",
+      "id": "23",
+      "attributes": {
+        "canceled": null,
+        "detail": "Aquarius Naranja",
+        "price": 0.0,
+        "quantity": 180.0
+      },
+      "relationships": {
+        "product": {
+          "data": {
+            "type": "Product",
+            "id": "25"
+          }
+        },
+        "ingredient": {
+          "data": null
+        }
+      }
+    },
+    {
+      "type": "Product",
+      "id": "25",
+      "attributes": {
+        "cost": 905.44,
+        "name": "Levite Naranja"
+      },
+      "relationships": {
+        "unit": {
+          "data": {
+            "type": "Unit",
+            "id": "1"
+          }
+        }
+      }
+    },
+    {
+      "type": "ExpenseItem",
+      "id": "24",
+      "attributes": {
+        "canceled": null,
+        "detail": "Aquarius Pera",
+        "price": 0.0,
+        "quantity": 30.0
+      },
+      "relationships": {
+        "product": {
+          "data": {
+            "type": "Product",
+            "id": "22"
+          }
+        },
+        "ingredient": {
+          "data": null
+        }
+      }
+    },
+    {
+      "type": "Product",
+      "id": "22",
+      "attributes": {
+        "cost": 963.0,
+        "name": "Levite Pera"
+      },
+      "relationships": {
+        "unit": {
+          "data": {
+            "type": "Unit",
+            "id": "1"
+          }
+        }
+      }
+    },
+    {
+      "type": "ExpenseItem",
+      "id": "25",
+      "attributes": {
+        "canceled": null,
+        "detail": "Aquarius Pomelo",
+        "price": 0.0,
+        "quantity": 30.0
+      },
+      "relationships": {
+        "product": {
+          "data": {
+            "type": "Product",
+            "id": "24"
+          }
+        },
+        "ingredient": {
+          "data": null
+        }
+      }
+    },
+    {
+      "type": "Product",
+      "id": "24",
+      "attributes": {
+        "cost": 905.44,
+        "name": "Levite Pomelo"
+      },
+      "relationships": {
+        "unit": {
+          "data": {
+            "type": "Unit",
+            "id": "1"
+          }
+        }
+      }
+    },
+    {
+      "type": "ExpenseItem",
+      "id": "16",
+      "attributes": {
+        "canceled": true,
+        "detail": "Imperial Amber Lager Porrón",
+        "price": 0.0,
+        "quantity": 120.0
+      },
+      "relationships": {
+        "product": {
+          "data": {
+            "type": "Product",
+            "id": "33"
+          }
+        },
+        "ingredient": {
+          "data": null
+        }
+      }
+    },
+    {
+      "type": "Product",
+      "id": "33",
+      "attributes": {
+        "cost": 135.65,
+        "name": "Imperial Amber Porrón"
+      },
+      "relationships": {
+        "unit": {
+          "data": {
+            "type": "Unit",
+            "id": "1"
+          }
+        }
+      }
+    },
+    {
+      "type": "ExpenseItem",
+      "id": "17",
+      "attributes": {
+        "canceled": true,
+        "detail": "Imperial APA Porrón",
+        "price": 0.0,
+        "quantity": 12.0
+      },
+      "relationships": {
+        "product": {
+          "data": {
+            "type": "Product",
+            "id": "37"
+          }
+        },
+        "ingredient": {
+          "data": null
+        }
+      }
+    },
+    {
+      "type": "Product",
+      "id": "37",
+      "attributes": {
+        "cost": 196.43,
+        "name": "Imperial APA Porrón"
+      },
+      "relationships": {
+        "unit": {
+          "data": {
+            "type": "Unit",
+            "id": "1"
+          }
+        }
+      }
+    },
+    {
+      "type": "ExpenseItem",
+      "id": "26",
+      "attributes": {
+        "canceled": null,
+        "detail": "Imperial IPA Porrón",
+        "price": 0.0,
+        "quantity": 12.0
+      },
+      "relationships": {
+        "product": {
+          "data": {
+            "type": "Product",
+            "id": "35"
+          }
+        },
+        "ingredient": {
+          "data": null
+        }
+      }
+    },
+    {
+      "type": "Product",
+      "id": "35",
+      "attributes": {
+        "cost": 196.34,
+        "name": "Imperial IPA Porrón"
+      },
+      "relationships": {
+        "unit": {
+          "data": {
+            "type": "Unit",
+            "id": "1"
+          }
+        }
+      }
+    },
+    {
+      "type": "ExpenseItem",
+      "id": "27",
+      "attributes": {
+        "canceled": null,
+        "detail": "Imperial Amber Lager Porrón",
+        "price": 0.0,
+        "quantity": 12.0
+      },
+      "relationships": {
+        "product": {
+          "data": {
+            "type": "Product",
+            "id": "33"
+          }
+        },
+        "ingredient": {
+          "data": null
+        }
+      }
+    },
+    {
+      "type": "PaymentMethod",
+      "id": "1",
+      "attributes": {
+        "code": "cash",
+        "name": "Efectivo"
+      }
+    },
+    {
+      "type": "Provider",
+      "id": "3",
+      "attributes": {
+        "name": "Distribuidora Iceberg"
+      }
+    },
+    {
+      "type": "ReceiptType",
+      "id": "1",
+      "attributes": {
+        "name": "Factura A"
+      }
+    },
+    {
+      "type": "User",
+      "id": "1",
+      "attributes": {
+        "name": "Administrador"
+      }
+    }
+  ]
+}

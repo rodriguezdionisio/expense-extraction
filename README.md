@@ -1,250 +1,222 @@
-# Fudo Data Extraction Pipeline
+# Expense Extraction & Processing System
 
-Pipeline para extraer y procesar datos de la API de Fudo, diseñado para almacenamiento en data lake con **particionado por fecha**.
+Sistema completo de extracción y procesamiento de gastos desde la API de Fudo con transformación a CSV estructurado.
 
-## 🏗️ Arquitectura
+## Descripción
 
-```
-Raw Data por Fecha (JSON) → Processing → Clean CSV Files
-        ↓                     ↓              ↓
-   expenses_by_date/    src/process_    processed_data/
-                        expenses.py
-```
+Este proyecto extrae datos de gastos (expenses) desde la API REST de Fudo, los procesa y los convierte en archivos CSV particionados por fecha para análisis de datos. El sistema incluye extracción dual-mode (inicial vs mantenimiento), transformaciones de datos avanzadas, y organización Hive-style de archivos.
 
-## 📁 Estructura de Archivos
+## Características Principales
+
+- **🔄 Extracción Dual-Mode**: Modo inicial (desde ID 1) y mantenimiento (incremental)
+- **📊 Procesamiento CSV**: Conversión automática de JSON a CSV con particionado por fecha
+- **🏗️ Transformación de Datos**: Renombrado de columnas, conversión de tipos, y manejo de zonas horarias
+- **📁 Organización Hive-Style**: Estructura `processed_data/date=YYYY-MM-DD/`
+- **🔐 Autenticación Segura**: Integración con Google Cloud Secret Manager
+- **📈 Update Logic**: Append a archivos existentes en lugar de reemplazar
+- **🌍 Timezone Support**: Conversión automática a zona horaria Argentina
+
+## Estructura del Proyecto
 
 ```
 expense-extraction/
-├── main.py                  # Orquestador principal
-├── src/                     # Módulos principales
-│   ├── extract_expenses.py  # Extractor de datos raw en JSON
-│   └── process_expenses.py  # Procesador JSON → CSV
-├── raw_data/                # Datos raw en JSON
-│   ├── expenses/
-│   ├── payment-methods/
-│   └── cash-registers/
-├── processed_data/          # Datos procesados en CSV
-├── utils/                   # Utilidades
-└── config/                  # Configuración
+├── config/
+│   └── credentials.json          # Credenciales de Google Cloud
+├── utils/
+│   ├── __init__.py
+│   ├── env_config.py            # Configuración de variables de entorno
+│   ├── fudo.py                  # Cliente API de Fudo
+│   ├── gcp.py                   # Utilidades de Google Cloud
+│   └── logger.py                # Sistema de logging
+├── extraction_data/             # Archivos JSON individuales por expense
+│   ├── expense_1.json
+│   ├── expense_2.json
+│   └── ...
+├── processed_data/              # Archivos CSV particionados por fecha
+│   ├── date=2020-01-04/
+│   │   ├── fact_expenses.csv
+│   │   └── fact_expense_orders.csv
+│   ├── date=2020-01-06/
+│   │   ├── fact_expenses.csv
+│   │   └── fact_expense_orders.csv
+│   └── ...
+├── expense_extractor.py         # Sistema de extracción de API
+├── expense_processor.py         # Sistema de procesamiento CSV
+├── run_extraction.py           # Utilidad CLI para extracción
+├── run_processing.py           # Utilidad CLI para procesamiento
+├── requirements.txt            # Dependencias
+└── README.md                   # Este archivo
 ```
 
-## 🚀 Uso Principal: Extracción por Fecha (recomendado)
+## Instalación
 
-### Extracción Completa
+1. **Clonar el repositorio**:
 ```bash
-# Extraer todos los datos particionados por DÍA (máxima granularidad)
-python main.py --mode extract-by-date --partition-by day
-
-# Extraer todos los datos particionados por MES (balance óptimo)
-python main.py --mode extract-by-date --partition-by month
-
-# Extraer todos los datos particionados por AÑO (agregado)
-python main.py --mode extract-by-date --partition-by year
+git clone <repository-url>
+cd expense-extraction
 ```
 
-### Extracción de Períodos Específicos
+2. **Crear entorno virtual**:
 ```bash
-# Extraer datos de un período específico por DÍA
-python main.py --mode extract-by-date --start-date 2025-01-01 --end-date 2025-12-31 --partition-by day
-
-# Extraer solo los últimos 30 días
-python main.py --mode extract-by-date --start-date 2025-07-01 --end-date 2025-07-30 --partition-by day
-
-# Extraer datos anuales
-python main.py --mode extract-by-date --start-date 2024-01-01 --end-date 2024-12-31 --partition-by year
+python -m venv .venv
+source .venv/bin/activate  # En Linux/Mac
+# .venv\Scripts\activate  # En Windows
 ```
 
-### Procesamiento de Datos
+3. **Instalar dependencias**:
 ```bash
-# Procesar datos JSON extraídos a CSV
-python main.py --mode process
+pip install -r requirements.txt
 ```
 
-### Ejecución Individual de Módulos
+4. **Configurar variables de entorno**:
 ```bash
-# Solo extracción (usar los módulos directamente)
-python src/extract_expenses.py
-
-# Solo procesamiento
-python src/process_expenses.py
+cp .env.example .env
+# Editar .env con tus valores
 ```
 
-## 📊 Outputs
+5. **Configurar credenciales de Google Cloud**:
+   - Crear proyecto en Google Cloud
+   - Habilitar Secret Manager API
+   - Crear service account y descargar credenciales
+   - Colocar credenciales en `config/credentials.json`
 
-### Raw Data (JSON) - Particionado por Fecha
-- `raw_data/expenses_by_date/expenses_day_YYYY-MM-DD_TIMESTAMP.json` - Archivos por día
-- `raw_data/expenses_by_date/expenses_month_YYYY-MM_TIMESTAMP.json` - Archivos por mes  
-- `raw_data/expenses_by_date/expenses_year_YYYY_TIMESTAMP.json` - Archivos por año
-- `raw_data/expenses_by_date/extraction_metadata_PARTITION_TIMESTAMP.json` - Metadatos de extracción
+## Configuración
 
-### Processed Data (CSV)
-- `processed_data/expenses_flattened_TIMESTAMP.csv` - Datos completos aplanados (archivo principal)
-- `processed_data/expense_items_relationships_TIMESTAMP.csv` - Relaciones de items
-- `processed_data/processing_report_expenses_TIMESTAMP.json` - Reporte de calidad
+### Variables de Entorno (.env)
 
-## 🎯 Ventajas de Extracción por Fecha
-
-### ✅ Para Data Lake
-- **Particionado natural**: Archivos organizados por fecha (año/mes/día)
-- **Consultas eficientes**: Acceso directo a períodos específicos
-- **Paralelización**: Procesamiento independiente por partición
-- **Escalabilidad**: Ideal para volúmenes grandes de datos
-
-### ✅ Para Análisis
-- **Actualizaciones incrementales**: Solo extraer nuevos datos
-- **Análisis temporal**: Comparación entre períodos
-- **Menor transferencia**: Descargar solo el rango necesario
-- **Recuperación granular**: Reextraer solo fechas específicas con errores
-
-### 📈 Recomendaciones de Uso
-- **Data Lake/S3**: Usar `--partition-by month` para balance óptimo
-- **Análisis diario**: Usar `--partition-by day` para granularidad máxima  
-- **Reportes anuales**: Usar `--partition-by year` para agregación
-- **Actualizaciones**: Especificar `--start-date` y `--end-date` para períodos específicos
-
-## 🔧 Configuración
-
-### Variables de Entorno
-```bash
-GCP_PROJECT_ID=your_project_id
+```env
+# Google Cloud
+GOOGLE_CLOUD_PROJECT=tu-proyecto-gcp
 GOOGLE_APPLICATION_CREDENTIALS=config/credentials.json
+
+# Fudo API
+FUDO_API_SECRET_NAME=fudo-api-key
+
+# Configuración de extracción
+EXPENSE_EXTRACTION_MODE=initial    # o 'maintenance'
+EXPENSE_START_ID=1
 ```
 
-### Secrets en GCP
-- `fudo-api-key`: API Key de Fudo
-- `fudo-api-secret`: API Secret de Fudo
+## Uso del Sistema
 
-## 📋 Campos Extraídos
+### 1. Extracción de Datos
 
-### Gastos (Expenses)
-- **Básicos**: ID, monto, fecha, descripción, estado cancelado
-- **Timestamps**: fecha creación, fecha vencimiento
-- **Relaciones**: 
-  - Caja registradora (ID/tipo)
-  - Método de pago (ID/tipo)
-  - Categoría de gasto (ID/tipo)
-  - Items de gasto (IDs/tipos/cantidad)
-
-### Estructura de Datos
-```json
-{
-  "id": "123",
-  "type": "Expense",
-  "attributes": {
-    "amount": 1500.0,
-    "date": "2025-01-15",
-    "description": "Compra de materiales"
-  },
-  "relationships": {
-    "paymentMethod": {"data": {"id": "1", "type": "PaymentMethod"}},
-    "expenseItems": {"data": [{"id": "456", "type": "ExpenseItem"}]}
-  }
-}
-```
-
-## 🔄 Procesamiento
-
-### Aplanado de Datos
-- `attributes` → campos con prefijo `attr_`
-- `relationships` → campos con prefijo `rel_`
-- Listas → campos `_count`, `_ids`, `_types`
-
-### Ejemplo de Transformación
-```
-JSON: {"attributes": {"amount": 1500}, "relationships": {"paymentMethod": {"data": {"id": "1"}}}}
-CSV:  attr_amount=1500, rel_paymentMethod_id=1
-```
-
-## 📈 Análisis Incluidos
-
-### Datos Generados
-- **Flattened CSV**: Datos completos aplanados con todos los campos y relaciones
-- **Relationships CSV**: Mapeo detallado de gastos → items de gastos
-- **Calidad de datos**: Reporte JSON con estadísticas y validaciones
-
-### Archivos Especializados
-- **Flattened CSV**: Archivo principal con todos los datos normalizados
-- **Relationships CSV**: Mapeo de gastos → items para análisis relacionales
-- **Processing Report**: Métricas de calidad y estadísticas de procesamiento
-
-## 🛠️ Mantenimiento
-
-### Logs
-Todos los procesos generan logs detallados usando el sistema de logging configurado.
-
-### Recuperación de Errores
-- Extracción por páginas permite reanudar desde cualquier punto
-- Metadatos de extracción incluyen información de recuperación
-- Procesamiento valida archivos JSON antes de procesar
-
-### Monitoreo
-- Reportes de calidad de datos en JSON
-- Conteo de registros en cada fase
-- Timestamps para auditoría
-
-## 🔍 Troubleshooting
-
-### Error de Autenticación
+#### Modo Inicial (Carga completa)
 ```bash
-# Verificar secrets
-python -c "from utils.gcp import get_secret; print(get_secret('fudo-api-key'))"
+# Configurar modo inicial en .env
+EXPENSE_EXTRACTION_MODE=initial
+
+# Ejecutar extracción desde ID 1
+python run_extraction.py
 ```
 
-### Error de Datos Faltantes
+#### Modo Mantenimiento (Incremental)
 ```bash
-# Verificar archivos raw
-ls -la raw_data/expenses/
+# Configurar modo mantenimiento en .env
+EXPENSE_EXTRACTION_MODE=maintenance
+EXPENSE_START_ID=500
+
+# Ejecutar extracción incremental
+python run_extraction.py
 ```
 
-### Error de Procesamiento
+#### Extracción por Rango
 ```bash
-# Ejecutar solo procesamiento con logs
-python src/process_expenses.py
+# Extraer IDs específicos (ej: 1-20)
+python run_extraction.py range 1 20
 ```
 
-## 📚 Ejemplos de Uso Prácticos
+### 2. Procesamiento a CSV
 
-### Extracción Inicial Completa
+#### Procesamiento Inicial
 ```bash
-# Extraer TODOS los datos disponibles particionados por día
-python main.py --mode extract-by-date --partition-by day
+# Procesar todos los archivos JSON a CSV particionado
+python run_processing.py
 ```
 
-### Actualización Incremental Diaria
+#### Procesamiento por Rango
 ```bash
-# Extraer solo los datos de hoy
-python main.py --mode extract-by-date --start-date 2025-07-30 --end-date 2025-07-30 --partition-by day
-
-# Extraer últimos 7 días
-python main.py --mode extract-by-date --start-date 2025-07-23 --end-date 2025-07-30 --partition-by day
+# Procesar rango específico (ej: IDs 1-20)
+python run_processing.py range 1 20
 ```
 
-### Data Lake con Python
+## Estructura de Archivos de Salida
+
+### Archivos CSV Generados
+
+#### `fact_expenses.csv` - Datos principales de gastos
+```csv
+expense_key,expense_amount,cancelled,expense_date_key,payment_date_key,due_date_key,created_date_key,created_time_key,expense_note,receipt_number,use_in_cash_count,cash_register_key,payment_method_key,provider_key,receipt_type_key,employee_key
+1,1500.0,False,20200104,20200110,20200115,20200104,1430,Compra materiales,001-123,True,1,2,45,1,7
+```
+
+#### `fact_expense_orders.csv` - Líneas de detalle (expense items)
+```csv
+expense_order_key,expense_key,cancelled,item_detail,item_price,item_quantity,product_key,product_name,product_cost,product_unit,ingredient_key,ingredient_name,ingredient_cost,ingredient_unit
+456,1,False,Harina 000,850.0,2.0,789,Harina 000 x 1kg,800.0,kg,101,Harina 000,800.0,kg
+```
+
+## Transformaciones Aplicadas
+
+### Columnas Expenses
+- `expense_id` → `expense_key` (int64)
+- `amount` → `expense_amount` (float64)
+- `canceled` → `cancelled` (bool)
+- `date` → `expense_date_key` (int64, formato YYYYMMDD)
+- `created_at` → `created_date_key`, `created_time_key` (int64, zona horaria Argentina)
+- `description` → `expense_note` (string)
+- IDs de relaciones → `*_key` (int64)
+
+### Columnas Expense Items
+- `expense_item_id` → `expense_order_key` (int64)
+- `expense_id` → `expense_key` (int64, FK)
+- `detail` → `item_detail` (string)
+- `price` → `item_price` (float64)
+- `quantity` → `item_quantity` (float64)
+- Datos de productos e ingredientes incluidos
+
+### Particionado por Fecha
+
+Los archivos se organizan en estructura Hive-style:
+```
+processed_data/
+├── date=2020-01-04/
+│   ├── fact_expenses.csv      # Expenses de esa fecha
+│   └── fact_expense_orders.csv # Items de esa fecha
+├── date=2020-01-06/
+│   ├── fact_expenses.csv
+│   └── fact_expense_orders.csv
+└── ...
+```
+
+## API Reference
+
+### ExpenseExtractor
 ```python
-from src.extract_expenses import FudoRawExtractor
+from expense_extractor import ExpenseExtractor
 
-extractor = FudoRawExtractor(output_dir="s3://my-data-lake/raw/fudo/")
-extractor.get_token()
+extractor = ExpenseExtractor()
 
-# Extracción particionada por mes para data lake
-result = extractor.extract_expenses_by_date(
-    start_date="2025-01-01",
-    end_date="2025-12-31", 
-    partition_by="month"
-)
+# Extraer expense individual con datos completos
+expense_data = extractor.get_expense_by_id(123)
+
+# Extraer rango y guardar archivos individuales
+extractor.extract_expenses_range(1, 100)
 ```
 
-### Procesamiento de Datos
+### ExpenseProcessor
 ```python
-from src.process_expenses import FudoDataProcessor
+from expense_processor import ExpenseProcessor
 
-processor = FudoDataProcessor(
-    raw_data_dir="raw_data/expenses_by_date/",
-    output_dir="processed_data/"
-)
-processor.process_expenses()
+processor = ExpenseProcessor()
+
+# Procesar todos los archivos JSON
+expenses_df, expense_items_df, summary = processor.run_initial_processing()
+
+# Procesar rango específico
+expenses_df, expense_items_df, summary = processor.run_range_processing(1, 20)
 ```
 
----
+## Licencia
 
-**Nota**: Este pipeline está diseñado para ser modular y escalable, permitiendo procesamiento tanto local como en cloud.
+Este proyecto está bajo la Licencia MIT - ver el archivo [LICENSE](LICENSE) para detalles.

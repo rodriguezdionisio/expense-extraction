@@ -1,0 +1,2 @@
+expense_key,expense_amount,cancelled,expense_date_key,payment_date_key,due_date_key,created_date_key,created_time_key,expense_note,receipt_number,use_in_cash_count,cash_register_key,payment_method_key,provider_key,receipt_type_key,employee_key
+18,430.0,,20200727,20200727,,20200727,1401,,0,False,1,1,4,0,1

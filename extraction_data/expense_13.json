@@ -1,0 +1,166 @@
+{
+  "data": {
+    "type": "Expense",
+    "id": "13",
+    "attributes": {
+      "amount": 0.0,
+      "canceled": null,
+      "createdAt": "2020-01-04T16:44:07Z",
+      "date": "2020-01-04",
+      "description": "Stock",
+      "dueDate": null,
+      "paymentDate": "2020-01-04",
+      "receiptNumber": "0",
+      "useInCashCount": true
+    },
+    "relationships": {
+      "cashRegister": {
+        "data": {
+          "type": "CashRegister",
+          "id": "1"
+        }
+      },
+      "expenseCategory": {
+        "data": null
+      },
+      "expenseItems": {
+        "data": [
+          {
+            "type": "ExpenseItem",
+            "id": "28"
+          },
+          {
+            "type": "ExpenseItem",
+            "id": "29"
+          }
+        ]
+      },
+      "paymentMethod": {
+        "data": {
+          "type": "PaymentMethod",
+          "id": "1"
+        }
+      },
+      "provider": {
+        "data": {
+          "type": "Provider",
+          "id": "5"
+        }
+      },
+      "receiptType": {
+        "data": null
+      },
+      "user": {
+        "data": {
+          "type": "User",
+          "id": "1"
+        }
+      }
+    }
+  },
+  "included": [
+    {
+      "type": "CashRegister",
+      "id": "1",
+      "attributes": {
+        "name": "Principal"
+      }
+    },
+    {
+      "type": "ExpenseItem",
+      "id": "28",
+      "attributes": {
+        "canceled": null,
+        "detail": "Aquarius Manzana",
+        "price": 0.0,
+        "quantity": 2.0
+      },
+      "relationships": {
+        "product": {
+          "data": {
+            "type": "Product",
+            "id": "23"
+          }
+        },
+        "ingredient": {
+          "data": null
+        }
+      }
+    },
+    {
+      "type": "Product",
+      "id": "23",
+      "attributes": {
+        "cost": 905.44,
+        "name": "Levite Manzana"
+      },
+      "relationships": {
+        "unit": {
+          "data": {
+            "type": "Unit",
+            "id": "1"
+          }
+        }
+      }
+    },
+    {
+      "type": "ExpenseItem",
+      "id": "29",
+      "attributes": {
+        "canceled": null,
+        "detail": "Aquarius Naranja",
+        "price": 0.0,
+        "quantity": 5.0
+      },
+      "relationships": {
+        "product": {
+          "data": {
+            "type": "Product",
+            "id": "25"
+          }
+        },
+        "ingredient": {
+          "data": null
+        }
+      }
+    },
+    {
+      "type": "Product",
+      "id": "25",
+      "attributes": {
+        "cost": 905.44,
+        "name": "Levite Naranja"
+      },
+      "relationships": {
+        "unit": {
+          "data": {
+            "type": "Unit",
+            "id": "1"
+          }
+        }
+      }
+    },
+    {
+      "type": "PaymentMethod",
+      "id": "1",
+      "attributes": {
+        "code": "cash",
+        "name": "Efectivo"
+      }
+    },
+    {
+      "type": "Provider",
+      "id": "5",
+      "attributes": {
+        "name": "Cocina"
+      }
+    },
+    {
+      "type": "User",
+      "id": "1",
+      "attributes": {
+        "name": "Administrador"
+      }
+    }
+  ]
+}

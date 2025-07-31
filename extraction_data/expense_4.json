@@ -1,0 +1,166 @@
+{
+  "data": {
+    "type": "Expense",
+    "id": "4",
+    "attributes": {
+      "amount": 1000.0,
+      "canceled": true,
+      "createdAt": "2019-11-07T00:45:26Z",
+      "date": "2019-11-06",
+      "description": null,
+      "dueDate": null,
+      "paymentDate": "2019-11-07",
+      "receiptNumber": "4",
+      "useInCashCount": false
+    },
+    "relationships": {
+      "cashRegister": {
+        "data": {
+          "type": "CashRegister",
+          "id": "1"
+        }
+      },
+      "expenseCategory": {
+        "data": null
+      },
+      "expenseItems": {
+        "data": [
+          {
+            "type": "ExpenseItem",
+            "id": "3"
+          },
+          {
+            "type": "ExpenseItem",
+            "id": "2"
+          }
+        ]
+      },
+      "paymentMethod": {
+        "data": {
+          "type": "PaymentMethod",
+          "id": "1"
+        }
+      },
+      "provider": {
+        "data": {
+          "type": "Provider",
+          "id": "3"
+        }
+      },
+      "receiptType": {
+        "data": null
+      },
+      "user": {
+        "data": {
+          "type": "User",
+          "id": "1"
+        }
+      }
+    }
+  },
+  "included": [
+    {
+      "type": "CashRegister",
+      "id": "1",
+      "attributes": {
+        "name": "Principal"
+      }
+    },
+    {
+      "type": "ExpenseItem",
+      "id": "3",
+      "attributes": {
+        "canceled": true,
+        "detail": "Sprite",
+        "price": 500.0,
+        "quantity": 100.0
+      },
+      "relationships": {
+        "product": {
+          "data": {
+            "type": "Product",
+            "id": "15"
+          }
+        },
+        "ingredient": {
+          "data": null
+        }
+      }
+    },
+    {
+      "type": "Product",
+      "id": "15",
+      "attributes": {
+        "cost": 36.85,
+        "name": "Sprite"
+      },
+      "relationships": {
+        "unit": {
+          "data": {
+            "type": "Unit",
+            "id": "1"
+          }
+        }
+      }
+    },
+    {
+      "type": "ExpenseItem",
+      "id": "2",
+      "attributes": {
+        "canceled": true,
+        "detail": "Coca-Cola",
+        "price": 500.0,
+        "quantity": 100.0
+      },
+      "relationships": {
+        "product": {
+          "data": {
+            "type": "Product",
+            "id": "1"
+          }
+        },
+        "ingredient": {
+          "data": null
+        }
+      }
+    },
+    {
+      "type": "Product",
+      "id": "1",
+      "attributes": {
+        "cost": null,
+        "name": "Coca Cola"
+      },
+      "relationships": {
+        "unit": {
+          "data": {
+            "type": "Unit",
+            "id": "1"
+          }
+        }
+      }
+    },
+    {
+      "type": "PaymentMethod",
+      "id": "1",
+      "attributes": {
+        "code": "cash",
+        "name": "Efectivo"
+      }
+    },
+    {
+      "type": "Provider",
+      "id": "3",
+      "attributes": {
+        "name": "Distribuidora Iceberg"
+      }
+    },
+    {
+      "type": "User",
+      "id": "1",
+      "attributes": {
+        "name": "Administrador"
+      }
+    }
+  ]
+}

@@ -1,0 +1,176 @@
+{
+  "data": {
+    "type": "Expense",
+    "id": "5",
+    "attributes": {
+      "amount": 1000.0,
+      "canceled": true,
+      "createdAt": "2019-11-07T00:45:28Z",
+      "date": "2019-11-06",
+      "description": null,
+      "dueDate": null,
+      "paymentDate": "2019-11-07",
+      "receiptNumber": "2",
+      "useInCashCount": false
+    },
+    "relationships": {
+      "cashRegister": {
+        "data": {
+          "type": "CashRegister",
+          "id": "1"
+        }
+      },
+      "expenseCategory": {
+        "data": null
+      },
+      "expenseItems": {
+        "data": [
+          {
+            "type": "ExpenseItem",
+            "id": "5"
+          },
+          {
+            "type": "ExpenseItem",
+            "id": "4"
+          }
+        ]
+      },
+      "paymentMethod": {
+        "data": {
+          "type": "PaymentMethod",
+          "id": "1"
+        }
+      },
+      "provider": {
+        "data": {
+          "type": "Provider",
+          "id": "2"
+        }
+      },
+      "receiptType": {
+        "data": {
+          "type": "ReceiptType",
+          "id": "1"
+        }
+      },
+      "user": {
+        "data": {
+          "type": "User",
+          "id": "1"
+        }
+      }
+    }
+  },
+  "included": [
+    {
+      "type": "CashRegister",
+      "id": "1",
+      "attributes": {
+        "name": "Principal"
+      }
+    },
+    {
+      "type": "ExpenseItem",
+      "id": "5",
+      "attributes": {
+        "canceled": true,
+        "detail": "7up",
+        "price": 500.0,
+        "quantity": 100.0
+      },
+      "relationships": {
+        "product": {
+          "data": {
+            "type": "Product",
+            "id": "16"
+          }
+        },
+        "ingredient": {
+          "data": null
+        }
+      }
+    },
+    {
+      "type": "Product",
+      "id": "16",
+      "attributes": {
+        "cost": 0.0,
+        "name": "7up"
+      },
+      "relationships": {
+        "unit": {
+          "data": {
+            "type": "Unit",
+            "id": "1"
+          }
+        }
+      }
+    },
+    {
+      "type": "ExpenseItem",
+      "id": "4",
+      "attributes": {
+        "canceled": true,
+        "detail": "Pepsi",
+        "price": 500.0,
+        "quantity": 100.0
+      },
+      "relationships": {
+        "product": {
+          "data": {
+            "type": "Product",
+            "id": "14"
+          }
+        },
+        "ingredient": {
+          "data": null
+        }
+      }
+    },
+    {
+      "type": "Product",
+      "id": "14",
+      "attributes": {
+        "cost": null,
+        "name": "Pepsi"
+      },
+      "relationships": {
+        "unit": {
+          "data": {
+            "type": "Unit",
+            "id": "1"
+          }
+        }
+      }
+    },
+    {
+      "type": "PaymentMethod",
+      "id": "1",
+      "attributes": {
+        "code": "cash",
+        "name": "Efectivo"
+      }
+    },
+    {
+      "type": "Provider",
+      "id": "2",
+      "attributes": {
+        "name": "Distribuidora del Valle"
+      }
+    },
+    {
+      "type": "ReceiptType",
+      "id": "1",
+      "attributes": {
+        "name": "Factura A"
+      }
+    },
+    {
+      "type": "User",
+      "id": "1",
+      "attributes": {
+        "name": "Administrador"
+      }
+    }
+  ]
+}

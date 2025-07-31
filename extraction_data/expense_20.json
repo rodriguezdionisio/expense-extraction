@@ -1,0 +1,103 @@
+{
+  "data": {
+    "type": "Expense",
+    "id": "20",
+    "attributes": {
+      "amount": 1000.0,
+      "canceled": true,
+      "createdAt": "2020-07-28T17:17:44Z",
+      "date": "2020-07-28",
+      "description": null,
+      "dueDate": null,
+      "paymentDate": "2020-07-28",
+      "receiptNumber": "0",
+      "useInCashCount": false
+    },
+    "relationships": {
+      "cashRegister": {
+        "data": {
+          "type": "CashRegister",
+          "id": "1"
+        }
+      },
+      "expenseCategory": {
+        "data": {
+          "type": "ExpenseCategory",
+          "id": "5"
+        }
+      },
+      "expenseItems": {
+        "data": []
+      },
+      "paymentMethod": {
+        "data": {
+          "type": "PaymentMethod",
+          "id": "1"
+        }
+      },
+      "provider": {
+        "data": {
+          "type": "Provider",
+          "id": "3"
+        }
+      },
+      "receiptType": {
+        "data": {
+          "type": "ReceiptType",
+          "id": "1"
+        }
+      },
+      "user": {
+        "data": {
+          "type": "User",
+          "id": "2"
+        }
+      }
+    }
+  },
+  "included": [
+    {
+      "type": "CashRegister",
+      "id": "1",
+      "attributes": {
+        "name": "Principal"
+      }
+    },
+    {
+      "type": "ExpenseCategory",
+      "id": "5",
+      "attributes": {
+        "name": "Gaseosas"
+      }
+    },
+    {
+      "type": "PaymentMethod",
+      "id": "1",
+      "attributes": {
+        "code": "cash",
+        "name": "Efectivo"
+      }
+    },
+    {
+      "type": "Provider",
+      "id": "3",
+      "attributes": {
+        "name": "Distribuidora Iceberg"
+      }
+    },
+    {
+      "type": "ReceiptType",
+      "id": "1",
+      "attributes": {
+        "name": "Factura A"
+      }
+    },
+    {
+      "type": "User",
+      "id": "2",
+      "attributes": {
+        "name": "Encargado"
+      }
+    }
+  ]
+}

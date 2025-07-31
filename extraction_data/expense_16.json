@@ -1,0 +1,93 @@
+{
+  "data": {
+    "type": "Expense",
+    "id": "16",
+    "attributes": {
+      "amount": 2800.0,
+      "canceled": null,
+      "createdAt": "2020-01-07T00:06:32Z",
+      "date": "2020-01-06",
+      "description": "22 Milanesas y 3kg de picada",
+      "dueDate": null,
+      "paymentDate": "2020-01-07",
+      "receiptNumber": "0",
+      "useInCashCount": true
+    },
+    "relationships": {
+      "cashRegister": {
+        "data": {
+          "type": "CashRegister",
+          "id": "1"
+        }
+      },
+      "expenseCategory": {
+        "data": {
+          "type": "ExpenseCategory",
+          "id": "4"
+        }
+      },
+      "expenseItems": {
+        "data": []
+      },
+      "paymentMethod": {
+        "data": {
+          "type": "PaymentMethod",
+          "id": "1"
+        }
+      },
+      "provider": {
+        "data": {
+          "type": "Provider",
+          "id": "7"
+        }
+      },
+      "receiptType": {
+        "data": null
+      },
+      "user": {
+        "data": {
+          "type": "User",
+          "id": "1"
+        }
+      }
+    }
+  },
+  "included": [
+    {
+      "type": "CashRegister",
+      "id": "1",
+      "attributes": {
+        "name": "Principal"
+      }
+    },
+    {
+      "type": "ExpenseCategory",
+      "id": "4",
+      "attributes": {
+        "name": "Comida"
+      }
+    },
+    {
+      "type": "PaymentMethod",
+      "id": "1",
+      "attributes": {
+        "code": "cash",
+        "name": "Efectivo"
+      }
+    },
+    {
+      "type": "Provider",
+      "id": "7",
+      "attributes": {
+        "name": "Carnicería"
+      }
+    },
+    {
+      "type": "User",
+      "id": "1",
+      "attributes": {
+        "name": "Administrador"
+      }
+    }
+  ]
+}

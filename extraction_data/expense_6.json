@@ -1,0 +1,248 @@
+{
+  "data": {
+    "type": "Expense",
+    "id": "6",
+    "attributes": {
+      "amount": 0.0,
+      "canceled": true,
+      "createdAt": "2019-12-30T01:16:27Z",
+      "date": "2019-12-29",
+      "description": null,
+      "dueDate": null,
+      "paymentDate": "2019-12-30",
+      "receiptNumber": "1",
+      "useInCashCount": true
+    },
+    "relationships": {
+      "cashRegister": {
+        "data": {
+          "type": "CashRegister",
+          "id": "1"
+        }
+      },
+      "expenseCategory": {
+        "data": null
+      },
+      "expenseItems": {
+        "data": [
+          {
+            "type": "ExpenseItem",
+            "id": "6"
+          },
+          {
+            "type": "ExpenseItem",
+            "id": "7"
+          },
+          {
+            "type": "ExpenseItem",
+            "id": "8"
+          },
+          {
+            "type": "ExpenseItem",
+            "id": "9"
+          }
+        ]
+      },
+      "paymentMethod": {
+        "data": {
+          "type": "PaymentMethod",
+          "id": "1"
+        }
+      },
+      "provider": {
+        "data": {
+          "type": "Provider",
+          "id": "3"
+        }
+      },
+      "receiptType": {
+        "data": null
+      },
+      "user": {
+        "data": {
+          "type": "User",
+          "id": "1"
+        }
+      }
+    }
+  },
+  "included": [
+    {
+      "type": "CashRegister",
+      "id": "1",
+      "attributes": {
+        "name": "Principal"
+      }
+    },
+    {
+      "type": "ExpenseItem",
+      "id": "6",
+      "attributes": {
+        "canceled": true,
+        "detail": "Coca Cola",
+        "price": 1720.0,
+        "quantity": 48.0
+      },
+      "relationships": {
+        "product": {
+          "data": {
+            "type": "Product",
+            "id": "1"
+          }
+        },
+        "ingredient": {
+          "data": null
+        }
+      }
+    },
+    {
+      "type": "Product",
+      "id": "1",
+      "attributes": {
+        "cost": null,
+        "name": "Coca Cola"
+      },
+      "relationships": {
+        "unit": {
+          "data": {
+            "type": "Unit",
+            "id": "1"
+          }
+        }
+      }
+    },
+    {
+      "type": "ExpenseItem",
+      "id": "7",
+      "attributes": {
+        "canceled": true,
+        "detail": "Aquarius Manzana",
+        "price": 500.0,
+        "quantity": 12.0
+      },
+      "relationships": {
+        "product": {
+          "data": {
+            "type": "Product",
+            "id": "23"
+          }
+        },
+        "ingredient": {
+          "data": null
+        }
+      }
+    },
+    {
+      "type": "Product",
+      "id": "23",
+      "attributes": {
+        "cost": 905.44,
+        "name": "Levite Manzana"
+      },
+      "relationships": {
+        "unit": {
+          "data": {
+            "type": "Unit",
+            "id": "1"
+          }
+        }
+      }
+    },
+    {
+      "type": "ExpenseItem",
+      "id": "8",
+      "attributes": {
+        "canceled": true,
+        "detail": "Aquarius Pera",
+        "price": 500.0,
+        "quantity": 12.0
+      },
+      "relationships": {
+        "product": {
+          "data": {
+            "type": "Product",
+            "id": "22"
+          }
+        },
+        "ingredient": {
+          "data": null
+        }
+      }
+    },
+    {
+      "type": "Product",
+      "id": "22",
+      "attributes": {
+        "cost": 963.0,
+        "name": "Levite Pera"
+      },
+      "relationships": {
+        "unit": {
+          "data": {
+            "type": "Unit",
+            "id": "1"
+          }
+        }
+      }
+    },
+    {
+      "type": "ExpenseItem",
+      "id": "9",
+      "attributes": {
+        "canceled": true,
+        "detail": "Mirinda",
+        "price": 280.0,
+        "quantity": 10.0
+      },
+      "relationships": {
+        "product": {
+          "data": {
+            "type": "Product",
+            "id": "18"
+          }
+        },
+        "ingredient": {
+          "data": null
+        }
+      }
+    },
+    {
+      "type": "Product",
+      "id": "18",
+      "attributes": {
+        "cost": null,
+        "name": "Mirinda"
+      },
+      "relationships": {
+        "unit": {
+          "data": {
+            "type": "Unit",
+            "id": "1"
+          }
+        }
+      }
+    },
+    {
+      "type": "PaymentMethod",
+      "id": "1",
+      "attributes": {
+        "code": "cash",
+        "name": "Efectivo"
+      }
+    },
+    {
+      "type": "Provider",
+      "id": "3",
+      "attributes": {
+        "name": "Distribuidora Iceberg"
+      }
+    },
+    {
+      "type": "User",
+      "id": "1",
+      "attributes": {
+        "name": "Administrador"
+      }
+    }
+  ]
+}
