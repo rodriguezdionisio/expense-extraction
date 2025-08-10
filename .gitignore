@@ -9,3 +9,4 @@ __pycache__/
 raw_data/
 clean/
 raw/
+logs/

@@ -15,6 +15,8 @@ def extract_range(start_id: int, end_id: int):
     print("="*60)
     
     extractor = ExpenseExtractor()
+    # Inicializar log con archivos existentes si es necesario
+    extractor.initialize_log_from_existing_files()
     expenses, count = extractor.extract_range(start_id, end_id)
     
     print(f"\n✅ EXTRACCIÓN COMPLETADA")
