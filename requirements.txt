@@ -2,7 +2,8 @@
 # Optimized requirements for the simplified architecture
 
 # Core data processing
-pandas>=2.0.0                    # DataFrame processing and CSV generation
+pandas>=2.0.0                    # DataFrame processing and Parquet generation
+pyarrow>=12.0.0                  # Parquet file format support
 requests>=2.31.0                 # HTTP requests to Fudo API
 python-dotenv>=1.0.0             # Environment variables management
 

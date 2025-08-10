@@ -1,10 +1,17 @@
-# Expense Extraction & Processing System
+# Expense - **📊 Extracción Inteligente**: Sistema con logging para prevenir duplicados automáticamente
+- **🏗️ Arquitectura Simplificada**: Código optimizado reducido en 28% manteniendo funcionalidad completa
+- **📁 Estructura Data Warehouse**: Tablas fact separadas (`fact_expenses`, `fact_expense_orders`)
+- **🗂️ Particionado Hive-Style**: Estructura `clean/fact_*/date=YYYY-MM-DD/`
+- **🚀 Formato Parquet**: Archivos de alto rendimiento con compresión y tipado optimizado
+- **🔐 Autenticación Segura**: Integración con Google Cloud Secret Manager
+- **📝 Sistema de Logging**: Prevención automática de extracciones duplicadas
+- **🛠️ Scripts CLI Simplificados**: Interfaces de línea de comandos fáciles de usarion & Processing System
 
-Sistema optimizado de extracción y procesamiento de gastos desde la API de Fudo con transformación a CSV estructurado y prevención de duplicados.
+Sistema optimizado de extracción y procesamiento de gastos desde la API de Fudo con transformación a Parquet estructurado y prevención de duplicados.
 
 ## Descripción
 
-Este proyecto extrae datos de gastos (expenses) desde la API REST de Fudo, los procesa y los convierte en archivos CSV particionados por fecha para análisis de datos. El sistema ha sido completamente optimizado con arquitectura simplificada, sistema de logging para prevenir duplicados, y estructura de datos tipo data warehouse.
+Este proyecto extrae datos de gastos (expenses) desde la API REST de Fudo, los procesa y los convierte en archivos Parquet particionados por fecha para análisis de datos. El sistema ha sido completamente optimizado con arquitectura simplificada, sistema de logging para prevenir duplicados, y estructura de datos tipo data warehouse con formato Parquet de alto rendimiento.
 
 ## Características Principales
 
@@ -34,15 +41,15 @@ expense-extraction/
 ├── clean/                       # Datos procesados en estructura data warehouse
 │   ├── fact_expenses/           # Tabla principal de gastos
 │   │   ├── date=2019-10-27/
-│   │   │   └── fact_expenses.csv
+│   │   │   └── fact_expenses.parquet
 │   │   ├── date=2020-01-04/
-│   │   │   └── fact_expenses.csv
+│   │   │   └── fact_expenses.parquet
 │   │   └── ...
 │   └── fact_expense_orders/     # Tabla de órdenes/items de gastos
 │       ├── date=2019-10-27/
-│       │   └── fact_expense_orders.csv
+│       │   └── fact_expense_orders.parquet
 │       ├── date=2020-01-04/
-│       │   └── fact_expense_orders.csv
+│       │   └── fact_expense_orders.parquet
 │       └── ...
 ├── logs/                        # Sistema de logging para duplicados
 │   └── extracted_expenses_log.txt
@@ -217,17 +224,37 @@ Los archivos se organizan en estructura Hive-style por tablas fact:
 clean/
 ├── fact_expenses/
 │   ├── date=2019-10-27/
-│   │   └── fact_expenses.csv      # Expenses de esa fecha
+│   │   └── fact_expenses.parquet      # Expenses de esa fecha
 │   ├── date=2020-01-04/
-│   │   └── fact_expenses.csv
+│   │   └── fact_expenses.parquet
 │   └── ...
 └── fact_expense_orders/
     ├── date=2019-10-27/
-    │   └── fact_expense_orders.csv # Items de esa fecha
+    │   └── fact_expense_orders.parquet # Items de esa fecha
     ├── date=2020-01-04/
-    │   └── fact_expense_orders.csv
+    │   └── fact_expense_orders.parquet
     └── ...
 ```
+
+### Archivos Parquet Generados
+
+#### `fact_expenses.parquet` - Datos principales de gastos
+Columnas optimizadas con tipos de datos eficientes:
+- `expense_key` (int64): Clave primaria del gasto
+- `expense_amount` (float64): Monto del gasto
+- `cancelled` (bool): Estado de cancelación
+- `expense_date_key` (int64): Fecha del gasto (YYYYMMDD)
+- `payment_date_key`, `due_date_key`, `created_date_key` (int64): Fechas relacionadas
+- `created_time_key` (int64): Hora de creación (HHMM)
+- Claves foráneas: `cashregister_key`, `paymentmethod_key`, `provider_key`, etc.
+
+#### `fact_expense_orders.parquet` - Líneas de detalle (expense items)
+Columnas optimizadas para análisis de items:
+- `expense_order_key` (int64): Clave primaria del item
+- `expense_key` (int64): Clave foránea al expense principal
+- `item_detail` (string): Descripción del item
+- `item_price`, `item_quantity` (float64): Precio y cantidad
+- Datos de productos e ingredientes con prefijos optimizados
 
 ## API Reference
 
@@ -261,6 +288,20 @@ processor.process_range(1, 20)
 - **Sistema de Logging**: Prevención automática de duplicados
 - **Scripts CLI Mejorados**: Interfaces más simples y directas
 - **Estructura Data Warehouse**: Separación clara de tablas fact
+- **Formato Parquet Optimizado**: 
+  - Compresión automática para menor uso de espacio
+  - Tipado de datos optimizado para consultas rápidas
+  - Compatible con herramientas de análisis modernas (Pandas, Spark, etc.)
+  - Metadatos incluidos para mejor rendimiento
+
+## Ventajas del Formato Parquet
+
+- **🚀 Rendimiento**: Consultas hasta 10x más rápidas que CSV
+- **💾 Compresión**: Archivos 50-80% más pequeños
+- **🎯 Tipado**: Preservación de tipos de datos (int64, float64, bool, string)
+- **📊 Compatibilidad**: Soporte nativo en Pandas, Spark, PowerBI, Tableau
+- **🔍 Filtrado**: Pushdown predicates para consultas eficientes
+- **📈 Columnar**: Almacenamiento optimizado para análisis
 
 ## Licencia
 

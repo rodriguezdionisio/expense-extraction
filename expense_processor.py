@@ -148,8 +148,8 @@ class ExpenseProcessor:
             logger.error(f"Error procesando expense: {e}")
             return None, []
     
-    def _save_to_csv(self, expenses_df, items_df):
-        """Guarda DataFrames a CSV particionados por fecha."""
+    def _save_to_parquet(self, expenses_df, items_df):
+        """Guarda DataFrames a Parquet particionados por fecha."""
         if expenses_df.empty:
             return {"dates_processed": [], "files_created": 0, "files_updated": 0}
         
@@ -166,8 +166,8 @@ class ExpenseProcessor:
                 os.makedirs(expenses_dir, exist_ok=True)
                 os.makedirs(items_dir, exist_ok=True)
                 
-                expenses_file = os.path.join(expenses_dir, "fact_expenses.csv")
-                items_file = os.path.join(items_dir, "fact_expense_orders.csv")
+                expenses_file = os.path.join(expenses_dir, "fact_expenses.parquet")
+                items_file = os.path.join(items_dir, "fact_expense_orders.parquet")
                 
                 # Filtrar datos por fecha
                 date_expenses = expenses_df[expenses_df['date'] == date_str].copy()
@@ -182,19 +182,19 @@ class ExpenseProcessor:
                 
                 # Expenses
                 if os.path.exists(expenses_file):
-                    existing = pd.read_csv(expenses_file)
+                    existing = pd.read_parquet(expenses_file)
                     existing = existing[~existing['expense_key'].isin(date_expenses['expense_key'])]
                     combined = pd.concat([existing, date_expenses], ignore_index=True).sort_values('expense_key').reset_index(drop=True)
                     is_update = True
                 else:
                     combined = date_expenses
                 
-                combined.to_csv(expenses_file, index=False, encoding='utf-8')
+                combined.to_parquet(expenses_file, index=False, engine='pyarrow')
                 
                 # Items
                 if not date_items.empty:
                     if os.path.exists(items_file):
-                        existing_items = pd.read_csv(items_file)
+                        existing_items = pd.read_parquet(items_file)
                         existing_items = existing_items[~existing_items['expense_key'].isin(date_items['expense_key'])]
                         combined_items = pd.concat([existing_items, date_items], ignore_index=True).sort_values('expense_order_key').reset_index(drop=True)
                     else:
@@ -207,7 +207,7 @@ class ExpenseProcessor:
                         'ingredient_key', 'ingredient_name', 'ingredient_cost', 'ingredient_unit'
                     ])
                 
-                combined_items.to_csv(items_file, index=False, encoding='utf-8')
+                combined_items.to_parquet(items_file, index=False, engine='pyarrow')
                 
                 action = "📔 ACTUALIZADO" if is_update else "📁 CREADO"
                 logger.info(f"{action} {date_str}: +{len(date_expenses)} expenses, +{len(date_items)} items | Total: {len(combined)} expenses, {len(combined_items)} items")
@@ -260,8 +260,8 @@ class ExpenseProcessor:
         logger.info(f"Total expenses: {len(expenses_list)}")
         logger.info(f"Total expense items: {len(items_list)}")
         
-        # Guardar CSV particionados
-        result = self._save_to_csv(expenses_df, items_df)
+        # Guardar Parquet particionados
+        result = self._save_to_parquet(expenses_df, items_df)
         
         logger.info("✅ PROCESAMIENTO DE RANGO COMPLETADO")
         logger.info(f"Total expenses: {len(expenses_list)}")
