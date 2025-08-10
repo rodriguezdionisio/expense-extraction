@@ -1,18 +1,22 @@
-# Core dependencies
-requests>=2.31.0
-pandas>=2.0.0
-python-dotenv>=1.0.0
+# Expense Extraction & Processing System - Dependencies
+# Optimized requirements for the simplified architecture
 
-# Google Cloud dependencies
-google-cloud-storage>=2.10.0
-google-cloud-secret-manager>=2.16.0
-google-auth>=2.23.0
-gcsfs>=2023.6.0
+# Core data processing
+pandas>=2.0.0                    # DataFrame processing and CSV generation
+requests>=2.31.0                 # HTTP requests to Fudo API
+python-dotenv>=1.0.0             # Environment variables management
 
-# Standard library imports (included in Python)
-# - json (built-in)
-# - os (built-in)
-# - sys (built-in)
-# - logging (built-in)
-# - pathlib (built-in)
-# - datetime (built-in)
+# Google Cloud integration
+google-cloud-secret-manager>=2.16.0  # Secure API credentials storage
+google-auth>=2.23.0              # GCP authentication
+
+# Timezone and date handling
+pytz>=2023.3                     # Timezone conversions (America/Bogota)
+
+# Note: Standard library modules used (no additional requirements):
+# - json (JSON processing)
+# - os (file system operations) 
+# - sys (command line arguments)
+# - logging (application logging)
+# - datetime (date/time handling)
+# - pathlib (path operations)

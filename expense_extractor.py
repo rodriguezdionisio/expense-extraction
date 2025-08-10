@@ -1,125 +1,73 @@
 #!/usr/bin/env python3
 """
-Extractor de expenses de la API de Fudo con soporte para logging de IDs extraídos.
+Extractor simplificado de expenses de la API de Fudo con logging automático.
 """
 
 import json
 import os
 import requests
 import time
-from datetime import datetime, timedelta
-from typing import List, Dict, Optional, Tuple
 from utils.gcp import get_secret
 from utils.logger import get_logger
 
 logger = get_logger(__name__)
 
-FUDO_AUTH_URL = "https://auth.fu.do/api"
-FUDO_API_URL = "https://api.fu.do/v1alpha1"
-EXTRACTION_DATA_DIR = "raw"
-EXTRACTED_LOG_FILE = "logs/extracted_expenses_log.txt"
-
 class ExpenseExtractor:
-    """Clase para extraer expenses de la API de Fudo."""
+    """Extractor simplificado de expenses."""
     
     def __init__(self):
         self.token = None
-        os.makedirs(EXTRACTION_DATA_DIR, exist_ok=True)
+        self.data_dir = "raw"
+        self.log_file = "logs/extracted_expenses_log.txt"
+        os.makedirs(self.data_dir, exist_ok=True)
         os.makedirs("logs", exist_ok=True)
     
-    def get_extracted_ids(self):
-        """Obtiene la lista de IDs ya extraídos desde el archivo de log."""
+    def _get_extracted_ids(self):
+        """Lee IDs ya extraídos del log."""
         try:
-            if os.path.exists(EXTRACTED_LOG_FILE):
-                with open(EXTRACTED_LOG_FILE, 'r') as f:
+            if os.path.exists(self.log_file):
+                with open(self.log_file, 'r') as f:
                     return {int(line.strip()) for line in f if line.strip().isdigit()}
-            return set()
         except Exception as e:
-            logger.warning(f"Error leyendo archivo de log: {e}")
-            return set()
+            logger.warning(f"Error leyendo log: {e}")
+        return set()
     
-    def log_extracted_id(self, expense_id):
-        """Registra un ID como extraído en el archivo de log."""
+    def _log_extracted_id(self, expense_id):
+        """Registra ID extraído en el log."""
         try:
-            with open(EXTRACTED_LOG_FILE, 'a') as f:
+            with open(self.log_file, 'a') as f:
                 f.write(f"{expense_id}\n")
         except Exception as e:
-            logger.error(f"Error escribiendo en el log: {e}")
+            logger.error(f"Error escribiendo log: {e}")
     
-    def filter_unextracted_ids(self, start_id, end_id):
-        """Filtra los IDs que aún no han sido extraídos."""
-        extracted_ids = self.get_extracted_ids()
-        all_ids = list(range(start_id, end_id + 1))
-        unextracted_ids = [id for id in all_ids if id not in extracted_ids]
-        
-        if len(unextracted_ids) != len(all_ids):
-            skipped_count = len(all_ids) - len(unextracted_ids)
-            logger.info(f"📋 Omitiendo {skipped_count} IDs ya extraídos, procesando {len(unextracted_ids)} IDs nuevos")
-        
-        return unextracted_ids
-
-    def initialize_log_from_existing_files(self):
-        """Inicializa el log con los IDs de archivos ya existentes en raw/."""
-        if os.path.exists(EXTRACTED_LOG_FILE):
-            logger.info("📋 Archivo de log ya existe, no es necesario inicializar")
-            return
-        
-        existing_files = []
-        if os.path.exists(EXTRACTION_DATA_DIR):
-            existing_files = [f for f in os.listdir(EXTRACTION_DATA_DIR) if f.startswith('expense_') and f.endswith('.json')]
-        
-        if not existing_files:
-            logger.info("📋 No hay archivos existentes, log inicializado vacío")
-            return
-        
-        existing_ids = []
-        for filename in existing_files:
-            try:
-                expense_id = int(filename.replace('expense_', '').replace('.json', ''))
-                existing_ids.append(expense_id)
-            except ValueError:
-                continue
-        
-        existing_ids.sort()
-        
-        with open(EXTRACTED_LOG_FILE, 'w') as f:
-            for expense_id in existing_ids:
-                f.write(f"{expense_id}\n")
-        
-        logger.info(f"📋 Log inicializado con {len(existing_ids)} IDs existentes: {min(existing_ids)}-{max(existing_ids)}")
-    
-    def get_token(self):
-        """Obtiene el token de autenticación desde la API de Fudo."""
+    def _get_token(self):
+        """Obtiene token de autenticación."""
+        if self.token:
+            return self.token
+            
         try:
-            api_key = get_secret("fudo-api-key")
-            api_secret = get_secret("fudo-api-secret")
-
-            payload = {"apiKey": api_key, "apiSecret": api_secret}
-            headers = {"Content-Type": "application/json"}
-
-            response = requests.post(FUDO_AUTH_URL, json=payload, headers=headers)
+            payload = {
+                "apiKey": get_secret("fudo-api-key"),
+                "apiSecret": get_secret("fudo-api-secret")
+            }
+            response = requests.post("https://auth.fu.do/api", json=payload)
             response.raise_for_status()
-
-            token = response.json().get("token")
-            if not token:
-                raise Exception("Token no encontrado en la respuesta.")
-
-            logger.info("Token obtenido correctamente desde Fudo.")
-            self.token = token
-            return token
-
+            
+            self.token = response.json().get("token")
+            if not self.token:
+                raise Exception("Token no encontrado")
+                
+            logger.info("Token obtenido correctamente")
+            return self.token
         except Exception as e:
-            logger.error(f"Error al obtener token: {e}")
+            logger.error(f"Error obteniendo token: {e}")
             raise
     
-    def get_expense_by_id(self, expense_id):
-        """Obtiene un expense específico por ID con todos los campos disponibles."""
+    def _fetch_expense(self, expense_id):
+        """Obtiene un expense por ID."""
         try:
-            if not self.token:
-                self.get_token()
-                
-            headers = {"Authorization": f"Bearer {self.token}"}
-            url = f"{FUDO_API_URL}/expenses/{expense_id}"
+            headers = {"Authorization": f"Bearer {self._get_token()}"}
+            url = f"https://api.fu.do/v1alpha1/expenses/{expense_id}"
             
             params = {
                 "fields[expense]": "amount,canceled,cashRegister,createdAt,date,description,dueDate,expenseCategory,expenseItems,paymentDate,paymentMethod,provider,receiptNumber,receiptType,useInCashCount,user",
@@ -138,49 +86,76 @@ class ExpenseExtractor:
             response = requests.get(url, headers=headers, params=params)
             
             if response.status_code == 404:
-                logger.info(f"Expense {expense_id} no encontrado (404)")
+                logger.info(f"Expense {expense_id} no encontrado")
                 return None
             elif response.status_code == 401:
                 logger.warning("Token expirado, renovando...")
                 self.token = None
-                self.get_token()
-                headers = {"Authorization": f"Bearer {self.token}"}
-                response = requests.get(url, headers=headers, params=params)
+                return self._fetch_expense(expense_id)  # Retry con nuevo token
             
             response.raise_for_status()
-            
             logger.info(f"Expense {expense_id} extraído correctamente")
             return response.json()
             
         except Exception as e:
-            logger.error(f"Error al obtener expense {expense_id}: {e}")
+            logger.error(f"Error obteniendo expense {expense_id}: {e}")
             return None
-
-    def save_individual_expense(self, expense_data, expense_id):
-        """Guarda un expense individual en un archivo JSON."""
+    
+    def _save_expense(self, expense_data, expense_id):
+        """Guarda expense en archivo JSON."""
         try:
-            filename = f"expense_{expense_id}.json"
-            filepath = os.path.join(EXTRACTION_DATA_DIR, filename)
-            
+            filepath = os.path.join(self.data_dir, f"expense_{expense_id}.json")
             with open(filepath, 'w', encoding='utf-8') as f:
                 json.dump(expense_data, f, ensure_ascii=False, indent=2)
-            
-            logger.info(f"Expense individual guardado: {filepath}")
+            logger.info(f"Guardado: {filepath}")
             return filepath
-            
         except Exception as e:
             logger.error(f"Error guardando expense {expense_id}: {e}")
             raise
-
+    
+    def initialize_log_from_existing_files(self):
+        """Inicializa log con archivos existentes si no existe."""
+        if os.path.exists(self.log_file):
+            logger.info("📋 Log ya existe")
+            return
+        
+        existing_files = [f for f in os.listdir(self.data_dir) 
+                         if f.startswith('expense_') and f.endswith('.json')] if os.path.exists(self.data_dir) else []
+        
+        if not existing_files:
+            logger.info("📋 Log inicializado vacío")
+            return
+        
+        existing_ids = []
+        for filename in existing_files:
+            try:
+                expense_id = int(filename.replace('expense_', '').replace('.json', ''))
+                existing_ids.append(expense_id)
+            except ValueError:
+                continue
+        
+        existing_ids.sort()
+        with open(self.log_file, 'w') as f:
+            for expense_id in existing_ids:
+                f.write(f"{expense_id}\n")
+        
+        logger.info(f"📋 Log inicializado con {len(existing_ids)} IDs: {min(existing_ids)}-{max(existing_ids)}")
+    
     def extract_range(self, start_id, end_id):
-        """Extrae expenses en un rango específico de IDs, omitiendo los ya extraídos."""
+        """Extrae expenses en un rango, omitiendo los ya extraídos."""
         logger.info(f"Iniciando extracción desde ID {start_id} hasta {end_id}")
         
         # Filtrar IDs ya extraídos
-        unextracted_ids = self.filter_unextracted_ids(start_id, end_id)
+        extracted_ids = self._get_extracted_ids()
+        all_ids = list(range(start_id, end_id + 1))
+        unextracted_ids = [id for id in all_ids if id not in extracted_ids]
+        
+        if len(unextracted_ids) != len(all_ids):
+            skipped = len(all_ids) - len(unextracted_ids)
+            logger.info(f"📋 Omitiendo {skipped} IDs ya extraídos, procesando {len(unextracted_ids)} nuevos")
         
         if not unextracted_ids:
-            logger.info("🎯 Todos los IDs en el rango ya fueron extraídos")
+            logger.info("🎯 Todos los IDs ya fueron extraídos")
             return [], 0
         
         expenses = []
@@ -188,21 +163,18 @@ class ExpenseExtractor:
         
         for expense_id in unextracted_ids:
             try:
-                expense_data = self.get_expense_by_id(expense_id)
-                
+                expense_data = self._fetch_expense(expense_id)
                 if expense_data:
                     expenses.append(expense_data)
-                    self.save_individual_expense(expense_data, expense_id)
-                    # Registrar en el log después de extracción exitosa
-                    self.log_extracted_id(expense_id)
+                    self._save_expense(expense_data, expense_id)
+                    self._log_extracted_id(expense_id)
                     successful_count += 1
                 
-                # Pequeña pausa para no sobrecargar la API
-                time.sleep(0.1)
+                time.sleep(0.1)  # Pausa para no sobrecargar API
                 
             except Exception as e:
                 logger.error(f"Error procesando ID {expense_id}: {e}")
                 continue
         
-        logger.info(f"Extracción completada. Total expenses extraídos: {successful_count}")
+        logger.info(f"Extracción completada. Total extraídos: {successful_count}")
         return expenses, successful_count
