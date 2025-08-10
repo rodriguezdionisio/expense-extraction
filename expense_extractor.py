@@ -11,14 +11,11 @@ from datetime import datetime, timedelta
 from typing import List, Dict, Optional, Tuple
 from utils.gcp import get_secret
 from utils.logger import get_logger
-from utils.env_config import config
 
 logger = get_logger(__name__)
 
 FUDO_AUTH_URL = "https://auth.fu.do/api"
 FUDO_API_URL = "https://api.fu.do/v1alpha1"
-
-# Directorio para guardar las respuestas
 EXTRACTION_DATA_DIR = "extraction_data"
 
 class ExpenseExtractor:
@@ -26,17 +23,7 @@ class ExpenseExtractor:
     
     def __init__(self):
         self.token = None
-        self.mode = config.EXPENSE_EXTRACTION_MODE
-        self.start_id = config.EXPENSE_START_ID
-        self.page_size = config.EXPENSE_PAGE_SIZE
-        self.max_pages = config.EXPENSE_MAX_PAGES
-        self.ensure_data_directory()
-        
-    def ensure_data_directory(self):
-        """Crea el directorio para guardar los datos extraídos si no existe."""
-        if not os.path.exists(EXTRACTION_DATA_DIR):
-            os.makedirs(EXTRACTION_DATA_DIR)
-            logger.info(f"Directorio creado: {EXTRACTION_DATA_DIR}")
+        os.makedirs(EXTRACTION_DATA_DIR, exist_ok=True)
     
     def get_token(self) -> str:
         """Obtiene el token de autenticación desde la API de Fudo."""
@@ -63,15 +50,7 @@ class ExpenseExtractor:
             raise
     
     def get_expense_by_id(self, expense_id: int) -> Optional[Dict]:
-        """
-        Obtiene un expense específico por ID con todos los campos disponibles.
-        
-        Args:
-            expense_id: ID del expense a obtener
-            
-        Returns:
-            Dict con los datos del expense o None si no se encuentra
-        """
+        """Obtiene un expense específico por ID con todos los campos disponibles."""
         try:
             if not self.token:
                 self.get_token()
@@ -95,7 +74,6 @@ class ExpenseExtractor:
             
             response = requests.get(url, headers=headers, params=params)
             
-            # Si es 404, el expense no existe
             if response.status_code == 404:
                 logger.info(f"Expense {expense_id} no encontrado (404)")
                 return None
@@ -117,83 +95,71 @@ class ExpenseExtractor:
             logger.error(f"Error al obtener expense {expense_id}: {e}")
             raise
     
-    def extract_expenses_range(self, start_id: int, end_id: Optional[int] = None, batch_size: int = 50, save_individual: bool = True) -> Tuple[List[Dict], int]:
-        """
-        Extrae expenses en un rango de IDs.
-        
-        Args:
-            start_id: ID inicial
-            end_id: ID final (opcional, si no se especifica extrae hasta encontrar 404s consecutivos)
-            batch_size: Tamaño del lote para guardar datos
-            save_individual: Si True, guarda cada expense en archivo individual
+    def save_individual_expense(self, expense_data: Dict, expense_id: int) -> str:
+        """Guarda un expense individual en archivo JSON."""
+        try:
+            filename = f"expense_{expense_id}.json"
+            filepath = os.path.join(EXTRACTION_DATA_DIR, filename)
             
-        Returns:
-            Tuple con (lista de expenses extraídos, último ID procesado)
-        """
-        expenses = []
-        current_id = start_id
-        consecutive_404s = 0
-        max_consecutive_404s = 50  # Parar después de 50 404s consecutivos
-        individual_files = []  # Lista de archivos individuales creados
-        
-        logger.info(f"Iniciando extracción desde ID {start_id}")
-        if save_individual:
-            logger.info("Modo: Guardado individual de archivos activado")
-        
-        while True:
-            # Verificar condiciones de parada
-            if end_id and current_id > end_id:
-                logger.info(f"Alcanzado ID final: {end_id}")
-                break
+            with open(filepath, 'w', encoding='utf-8') as f:
+                json.dump(expense_data, f, indent=2, ensure_ascii=False)
                 
-            if consecutive_404s >= max_consecutive_404s:
-                logger.info(f"Encontrados {consecutive_404s} 404s consecutivos. Finalizando extracción.")
-                break
+            logger.info(f"Expense individual guardado: {filepath}")
+            return filepath
             
+        except Exception as e:
+            logger.error(f"Error guardando expense {expense_id}: {e}")
+            return None
+
+    def extract_range(self, start_id: int, end_id: int) -> Tuple[List[Dict], int]:
+        """Extrae expenses en un rango específico de IDs."""
+        logger.info(f"Iniciando extracción desde ID {start_id} hasta {end_id}")
+        
+        expenses = []
+        successful_count = 0
+        
+        for expense_id in range(start_id, end_id + 1):
             try:
-                expense_data = self.get_expense_by_id(current_id)
+                expense_data = self.get_expense_by_id(expense_id)
                 
                 if expense_data:
                     expenses.append(expense_data)
-                    consecutive_404s = 0  # Reset contador
-                    
-                    # Guardar archivo individual si está habilitado
-                    if save_individual:
-                        individual_file = self.save_individual_expense(expense_data, current_id)
-                        if individual_file:
-                            individual_files.append(individual_file)
-                    
-                    # Guardar lotes periódicamente (solo si no se están guardando archivos individuales)
-                    if not save_individual and len(expenses) % batch_size == 0:
-                        self.save_batch(expenses[-batch_size:], f"batch_{current_id - batch_size + 1}_{current_id}")
-                        logger.info(f"Guardado lote hasta ID {current_id}. Total extraídos: {len(expenses)}")
-                else:
-                    consecutive_404s += 1
-                    
-                current_id += 1
+                    self.save_individual_expense(expense_data, expense_id)
+                    successful_count += 1
                 
                 # Pequeña pausa para no sobrecargar la API
                 time.sleep(0.1)
                 
             except Exception as e:
-                logger.error(f"Error procesando ID {current_id}: {e}")
-                current_id += 1
-                consecutive_404s += 1
+                logger.error(f"Error procesando ID {expense_id}: {e}")
+                continue
         
-        # Guardar último lote si hay datos pendientes y no se están guardando archivos individuales
-        if not save_individual:
-            remaining = len(expenses) % batch_size
-            if remaining > 0:
-                self.save_batch(expenses[-remaining:], f"final_batch_{current_id - remaining}_{current_id - 1}")
+        logger.info(f"Extracción completada. Total expenses extraídos: {successful_count}")
+        return expenses, successful_count
+
+
+def main():
+    """Función principal."""
+    try:
+        extractor = ExpenseExtractor()
         
-        # Log del resumen
-        logger.info(f"Extracción completada. Total expenses: {len(expenses)}, Último ID: {current_id - 1}")
-        if save_individual:
-            logger.info(f"Archivos individuales creados: {len(individual_files)}")
-            for file in individual_files:
-                logger.info(f"  - {file}")
+        # Ejemplo: extraer primeros 10 expenses
+        start_id = 1
+        end_id = 10
         
-        return expenses, current_id - 1
+        expenses, count = extractor.extract_range(start_id, end_id)
+        
+        print(f"✅ Extracción completada")
+        print(f"📊 Expenses extraídos: {count}")
+        print(f"📁 Archivos guardados en: {EXTRACTION_DATA_DIR}")
+        
+    except Exception as e:
+        logger.error(f"Error en extracción: {e}")
+        print(f"❌ Error: {e}")
+
+
+if __name__ == "__main__":
+    main()
     
     def extract_recent_expenses(self, days_back: int = 7) -> List[Dict]:
         """

@@ -1,7 +1,7 @@
 expense_order_key,expense_key,cancelled,item_detail,item_price,item_quantity,product_key,product_name,product_cost,product_unit,ingredient_key,ingredient_name,ingredient_cost,ingredient_unit
-6,6,True,Coca Cola,1720.0,48.0,1,Coca Cola,,,0,,,
-7,6,True,Aquarius Manzana,500.0,12.0,23,Levite Manzana,1062.88,,0,,,
-8,6,True,Aquarius Pera,500.0,12.0,22,Levite Pera,963.0,,0,,,
-9,6,True,Mirinda,280.0,10.0,18,Mirinda,,,0,,,
-10,7,True,Coca Cola,0.0,30.0,1,Coca Cola,,,0,,,
-11,7,True,Aquarius Manzana,0.0,25.0,23,Levite Manzana,1062.88,,0,,,
+6,6,True,Coca Cola,1720.0,48.0,1,Coca Cola,0.0,,0,,0.0,
+7,6,True,Aquarius Manzana,500.0,12.0,23,Levite Manzana,1062.88,,0,,0.0,
+8,6,True,Aquarius Pera,500.0,12.0,22,Levite Pera,963.0,,0,,0.0,
+9,6,True,Mirinda,280.0,10.0,18,Mirinda,0.0,,0,,0.0,
+11,7,True,Aquarius Manzana,0.0,25.0,23,Levite Manzana,1062.88,,0,,0.0,
+10,7,True,Coca Cola,0.0,30.0,1,Coca Cola,0.0,,0,,0.0,

@@ -1,4 +1,4 @@
 expense_order_key,expense_key,cancelled,item_detail,item_price,item_quantity,product_key,product_name,product_cost,product_unit,ingredient_key,ingredient_name,ingredient_cost,ingredient_unit
-30,14,True,Medialunas,0.0,180.0,0,,,,29,Medialuna cruda,363.1,
-31,15,False,Hamburguesas,0.0,80.0,0,,,,22,Hamburguesa,1388.67,
-5466,14,False,Medialunas,1815.0,180.0,0,,,,29,Medialuna cruda,363.1,
+30,14,True,Medialunas,0.0,180.0,0,,0.0,,29,Medialuna cruda,363.1,
+5466,14,False,Medialunas,1815.0,180.0,0,,0.0,,29,Medialuna cruda,363.1,
+31,15,False,Hamburguesas,0.0,80.0,0,,0.0,,22,Hamburguesa,1388.67,
