@@ -1,6 +1,0 @@
-expense_key,expense_amount,cancelled,expense_date_key,payment_date_key,due_date_key,created_date_key,created_time_key,expense_note,receipt_number,use_in_cash_count,cash_register_key,payment_method_key,provider_key,receipt_type_key,employee_key
-9,0.0,True,20200104,20200104,,20200104,1305,,1,True,1,1,3,0,1
-10,0.0,True,20200104,20200104,,20200104,1305,,2,True,1,1,3,0,1
-11,23753.68,,20200104,20200104,,20200104,1306,,3420-00201279,True,1,1,3,1,1
-12,50000.0,True,20200104,20200104,,20200104,1325,,5654,True,1,1,3,0,1
-13,0.0,,20200104,20200104,,20200104,1344,Stock,0,True,1,1,5,0,1

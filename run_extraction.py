@@ -19,7 +19,7 @@ def extract_range(start_id: int, end_id: int):
     
     print(f"\n✅ EXTRACCIÓN COMPLETADA")
     print(f"📊 Expenses extraídos: {count}")
-    print(f"📁 Archivos guardados en extraction_data/")
+    print(f"📁 Archivos guardados en raw/")
     print("="*60)
     
     return expenses, count

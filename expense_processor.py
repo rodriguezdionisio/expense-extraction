@@ -13,8 +13,8 @@ from utils.logger import get_logger
 
 logger = get_logger(__name__)
 
-EXTRACTION_DATA_DIR = "extraction_data"
-PROCESSED_DATA_DIR = "processed_data"
+EXTRACTION_DATA_DIR = "raw"
+PROCESSED_DATA_DIR = "clean"
 
 class ExpenseProcessor:
     """Clase para procesar expenses de JSON a CSV aplanado."""
@@ -332,12 +332,14 @@ class ExpenseProcessor:
         
         for date_str in unique_dates:
             try:
-                # Crear directorio para la fecha
-                date_dir = os.path.join(PROCESSED_DATA_DIR, f"date={date_str}")
-                os.makedirs(date_dir, exist_ok=True)
+                # Crear directorios para la fecha
+                expenses_date_dir = os.path.join(PROCESSED_DATA_DIR, "fact_expenses", f"date={date_str}")
+                expense_items_date_dir = os.path.join(PROCESSED_DATA_DIR, "fact_expense_orders", f"date={date_str}")
+                os.makedirs(expenses_date_dir, exist_ok=True)
+                os.makedirs(expense_items_date_dir, exist_ok=True)
                 
-                expenses_file = os.path.join(date_dir, "fact_expenses.csv")
-                expense_items_file = os.path.join(date_dir, "fact_expense_orders.csv")
+                expenses_file = os.path.join(expenses_date_dir, "fact_expenses.csv")
+                expense_items_file = os.path.join(expense_items_date_dir, "fact_expense_orders.csv")
                 
                 # Filtrar datos por fecha
                 expenses_for_date = expenses_df[expenses_df['date'] == date_str].copy()

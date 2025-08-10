@@ -16,7 +16,7 @@ logger = get_logger(__name__)
 
 FUDO_AUTH_URL = "https://auth.fu.do/api"
 FUDO_API_URL = "https://api.fu.do/v1alpha1"
-EXTRACTION_DATA_DIR = "extraction_data"
+EXTRACTION_DATA_DIR = "raw"
 
 class ExpenseExtractor:
     """Clase para extraer expenses de la API de Fudo."""

@@ -1,4 +1,0 @@
-expense_key,expense_amount,cancelled,expense_date_key,payment_date_key,due_date_key,created_date_key,created_time_key,expense_note,receipt_number,use_in_cash_count,cash_register_key,payment_method_key,provider_key,receipt_type_key,employee_key
-14,1815.0,,20200106,20200106,,20200106,1144,Medialunas 180,0,True,1,1,37,1,1
-15,4639.0,,20200106,20200106,,20200106,1146,,0,True,1,1,9,1,1
-16,2800.0,,20200106,20200107,,20200106,2106,22 Milanesas y 3kg de picada,0,True,1,1,7,0,1
