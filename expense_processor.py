@@ -149,18 +149,17 @@ class ExpenseProcessor:
             return None, []
     
     def _save_to_parquet(self, expenses_df, items_df):
-        """Guarda DataFrames a Parquet particionados por fecha."""
-        if expenses_df.empty:
-            return {"dates_processed": [], "files_created": 0, "files_updated": 0}
+        """Guarda los DataFrames en archivos Parquet particionados por fecha y los sube a GCS."""
+        from utils.gcp import upload_parquet_to_gcs
+        from utils.env_config import config
         
-        unique_dates = expenses_df['date'].dropna().unique()
-        logger.info(f"Procesando {len(unique_dates)} fechas únicas")
-        
-        files_created = files_updated = 0
+        unique_dates = sorted(expenses_df['date'].unique())
+        files_created = 0
+        files_updated = 0
         
         for date_str in unique_dates:
             try:
-                # Crear directorios
+                # Crear directorios locales
                 expenses_dir = os.path.join(self.clean_dir, "fact_expenses", f"date={date_str}")
                 items_dir = os.path.join(self.clean_dir, "fact_expense_orders", f"date={date_str}")
                 os.makedirs(expenses_dir, exist_ok=True)
@@ -168,6 +167,10 @@ class ExpenseProcessor:
                 
                 expenses_file = os.path.join(expenses_dir, "fact_expenses.parquet")
                 items_file = os.path.join(items_dir, "fact_expense_orders.parquet")
+                
+                # Rutas GCS
+                gcs_expenses_path = f"clean/fact_expenses/date={date_str}/fact_expenses.parquet"
+                gcs_items_path = f"clean/fact_expense_orders/date={date_str}/fact_expense_orders.parquet"
                 
                 # Filtrar datos por fecha
                 date_expenses = expenses_df[expenses_df['date'] == date_str].copy()
@@ -189,7 +192,17 @@ class ExpenseProcessor:
                 else:
                     combined = date_expenses
                 
+                # Guardar localmente
                 combined.to_parquet(expenses_file, index=False, engine='pyarrow')
+                
+                # Subir a GCS
+                upload_success = upload_parquet_to_gcs(
+                    combined, 
+                    config.GCS_BUCKET_NAME, 
+                    gcs_expenses_path
+                )
+                if upload_success:
+                    logger.info(f"🌩️  Subido expenses a GCS: {gcs_expenses_path}")
                 
                 # Items
                 if not date_items.empty:
@@ -207,7 +220,17 @@ class ExpenseProcessor:
                         'ingredient_key', 'ingredient_name', 'ingredient_cost', 'ingredient_unit'
                     ])
                 
+                # Guardar items localmente
                 combined_items.to_parquet(items_file, index=False, engine='pyarrow')
+                
+                # Subir items a GCS
+                upload_success_items = upload_parquet_to_gcs(
+                    combined_items, 
+                    config.GCS_BUCKET_NAME, 
+                    gcs_items_path
+                )
+                if upload_success_items:
+                    logger.info(f"🌩️  Subido expense_orders a GCS: {gcs_items_path}")
                 
                 action = "📔 ACTUALIZADO" if is_update else "📁 CREADO"
                 logger.info(f"{action} {date_str}: +{len(date_expenses)} expenses, +{len(date_items)} items | Total: {len(combined)} expenses, {len(combined_items)} items")
@@ -223,7 +246,7 @@ class ExpenseProcessor:
         
         logger.info(f"✅ Procesamiento completado: {files_created} fechas nuevas, {files_updated} actualizadas")
         return {"dates_processed": list(unique_dates), "files_created": files_created, "files_updated": files_updated}
-    
+
     def process_range(self, start_id, end_id):
         """Procesa un rango de IDs."""
         logger.info(f"🔄 INICIANDO PROCESAMIENTO DE RANGO {start_id}-{end_id}")

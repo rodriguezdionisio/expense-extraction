@@ -31,22 +31,21 @@ def get_storage_client():
     return _storage_client
 
 
-def upload_csv_to_gcs(dataframe: pd.DataFrame, bucket_name: str, gcs_file_path: str, content_type: str = 'text/csv') -> bool:
+def upload_csv_to_gcs(dataframe: pd.DataFrame, bucket_name: str, gcs_file_path: str, content_type: str = 'text/csv'):
     """
-    Sube un DataFrame como CSV a Google Cloud Storage.
+    Sube un DataFrame de pandas como CSV a Google Cloud Storage.
 
     Args:
-        dataframe: DataFrame de Pandas.
-        bucket_name: Nombre del bucket en GCS.
-        gcs_file_path: Ruta destino (ej: 'carpeta/archivo.csv').
-        content_type: Tipo de contenido (por defecto 'text/csv').
+        dataframe: DataFrame de pandas.
+        bucket_name: Nombre del bucket de GCS.
+        gcs_file_path: Ruta del archivo en GCS.
+        content_type: Tipo de contenido del archivo.
 
     Returns:
-        True si la subida fue exitosa, False si hubo error.
+        bool: True si se subió correctamente, False en caso contrario.
     """
     client = get_storage_client()
     if not client:
-        logger.error("Cliente de GCS no disponible.")
         return False
 
     try:
@@ -58,6 +57,41 @@ def upload_csv_to_gcs(dataframe: pd.DataFrame, bucket_name: str, gcs_file_path: 
         return True
     except Exception as e:
         logger.error(f"Error al subir archivo a GCS: {e}")
+        return False
+
+
+def upload_parquet_to_gcs(dataframe: pd.DataFrame, bucket_name: str, gcs_file_path: str, content_type: str = 'application/octet-stream'):
+    """
+    Sube un DataFrame de pandas como Parquet a Google Cloud Storage.
+
+    Args:
+        dataframe: DataFrame de pandas.
+        bucket_name: Nombre del bucket de GCS.
+        gcs_file_path: Ruta del archivo en GCS.
+        content_type: Tipo de contenido del archivo.
+
+    Returns:
+        bool: True si se subió correctamente, False en caso contrario.
+    """
+    client = get_storage_client()
+    if not client:
+        return False
+
+    try:
+        bucket = client.bucket(bucket_name)
+        blob = bucket.blob(gcs_file_path)
+        
+        # Crear el archivo Parquet en memoria
+        import io
+        parquet_buffer = io.BytesIO()
+        dataframe.to_parquet(parquet_buffer, engine='pyarrow', index=False)
+        parquet_data = parquet_buffer.getvalue()
+        
+        blob.upload_from_string(parquet_data, content_type=content_type)
+        logger.info(f"Archivo Parquet subido con éxito a gs://{bucket_name}/{gcs_file_path}")
+        return True
+    except Exception as e:
+        logger.error(f"Error al subir archivo Parquet a GCS: {e}")
         return False
 
 
