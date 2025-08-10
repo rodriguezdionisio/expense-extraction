@@ -3,4 +3,4 @@ expense_order_key,expense_key,cancelled,item_detail,item_price,item_quantity,pro
 2,4,True,Coca-Cola,500.0,100.0,1,Coca Cola,,,0,,,
 3,4,True,Sprite,500.0,100.0,15,Sprite,36.85,,0,,,
 4,5,True,Pepsi,500.0,100.0,14,Pepsi,,,0,,,
-5,5,True,7up,500.0,100.0,16,7up,0.0,,0,,,
+5,5,True,7up,500.0,100.0,16,7up,853.99,,0,,,

@@ -197,7 +197,7 @@
       "type": "Product",
       "id": "210",
       "attributes": {
-        "cost": 333.33,
+        "cost": null,
         "name": "Coca Cola Zero"
       },
       "relationships": {
@@ -456,7 +456,7 @@
       "type": "Product",
       "id": "23",
       "attributes": {
-        "cost": 905.44,
+        "cost": 1062.88,
         "name": "Levite Manzana"
       },
       "relationships": {
@@ -567,7 +567,7 @@
       "type": "Product",
       "id": "24",
       "attributes": {
-        "cost": 905.44,
+        "cost": 1062.88,
         "name": "Levite Pomelo"
       },
       "relationships": {
