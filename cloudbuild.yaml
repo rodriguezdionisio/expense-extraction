@@ -1,0 +1,16 @@
+steps:
+  - name: 'gcr.io/cloud-builders/docker'
+    args: [
+      'build',
+      '-t',
+      'us-east1-docker.pkg.dev/$PROJECT_ID/resto-backend/dimension-extraction-cloudrun:${_VERSION_TAG}',
+      '.'
+    ]
+images:
+  - 'us-east1-docker.pkg.dev/$PROJECT_ID/resto-backend/dimension-extraction-cloudrun:${_VERSION_TAG}'
+
+options:
+  logging: CLOUD_LOGGING_ONLY
+
+substitutions:
+  _VERSION_TAG: 'latest'
