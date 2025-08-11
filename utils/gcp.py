@@ -94,6 +94,46 @@ def upload_parquet_to_gcs(dataframe: pd.DataFrame, bucket_name: str, gcs_file_pa
         return False
 
 
+def download_file_from_gcs(bucket_name: str, gcs_file_path: str, local_file_path: str) -> bool:
+    """
+    Descarga un archivo desde Google Cloud Storage al sistema de archivos local.
+
+    Args:
+        bucket_name: Nombre del bucket de GCS.
+        gcs_file_path: Ruta del archivo en GCS.
+        local_file_path: Ruta local donde guardar el archivo.
+
+    Returns:
+        bool: True si se descargó correctamente, False en caso contrario.
+    """
+    client = get_storage_client()
+    if not client:
+        return False
+
+    try:
+        bucket = client.bucket(bucket_name)
+        blob = bucket.blob(gcs_file_path)
+        
+        # Verificar si el archivo existe en GCS
+        if not blob.exists():
+            logger.info(f"Archivo no existe en GCS: gs://{bucket_name}/{gcs_file_path}")
+            return False
+        
+        # Crear directorio local si no existe
+        import os
+        local_dir = os.path.dirname(local_file_path)
+        if local_dir:
+            os.makedirs(local_dir, exist_ok=True)
+        
+        # Descargar el archivo
+        blob.download_to_filename(local_file_path)
+        logger.info(f"Archivo descargado con éxito desde gs://{bucket_name}/{gcs_file_path} a {local_file_path}")
+        return True
+    except Exception as e:
+        logger.error(f"Error al descargar archivo desde GCS: {e}")
+        return False
+
+
 def get_secret(secret_id: str) -> str:
     """
     Recupera el valor de un secreto almacenado en Secret Manager.

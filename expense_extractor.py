@@ -26,6 +26,34 @@ class ExpenseExtractor:
         self.token = None
         os.makedirs(EXTRACTION_DATA_DIR, exist_ok=True)
         os.makedirs("logs", exist_ok=True)
+        # Descargar el log desde GCS al inicializar el extractor
+        self._download_log_from_gcs()
+    
+    def _download_log_from_gcs(self):
+        """Descarga el archivo de log desde Google Cloud Storage si existe."""
+        from utils.gcp import download_file_from_gcs
+        from utils.env_config import config
+        
+        try:
+            if not config.GCS_BUCKET_NAME:
+                logger.warning("GCS_BUCKET_NAME no configurado, omitiendo descarga del log desde GCS")
+                return
+                
+            gcs_log_path = "logs/extracted_expenses_log.txt"
+            success = download_file_from_gcs(
+                bucket_name=config.GCS_BUCKET_NAME,
+                gcs_file_path=gcs_log_path,
+                local_file_path=EXTRACTED_LOG_FILE
+            )
+            
+            if success:
+                logger.info(f"📥 Archivo de log descargado desde GCS: {gcs_log_path}")
+            else:
+                logger.info(f"📄 No se encontró archivo de log en GCS, iniciando con log vacío")
+                
+        except Exception as e:
+            logger.warning(f"Error descargando log desde GCS: {e}")
+            # Continuar sin fallar si GCS no está disponible
     
     def get_extracted_ids(self) -> set:
         """Obtiene la lista de IDs ya extraídos desde el archivo de log."""
