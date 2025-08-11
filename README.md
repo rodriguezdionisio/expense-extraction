@@ -1,4 +1,21 @@
-# Expense - **📊 - **📊 Extracción Inteligente**: Sistema con logging para prevenir duplicados automáticamente
+# 📊 Expense Extraction & Processing System
+
+Sistema automatizado de extracción y procesamiento de gastos desde la API de Fudo con transformación a Parquet estructurado, orquestación completa y sincronización en Google Cloud Storage.
+
+## Descripción
+
+Este proyecto extrae datos de gastos (expenses) desde la API REST de Fudo, los procesa y los convierte en archivos Parquet particionados por fecha para análisis de datos. El sistema incluye un orquestador automatizado (`main.py`) que controla todo el pipeline, sistema de logging para prevenir duplicados, y estructura de datos tipo data warehouse con formato Parquet de alto rendimiento.
+
+## Características Principales
+
+- **📊 Extracción Inteligente**: Sistema con logging para prevenir duplicados automáticamente
+- **🏗️ Arquitectura Simplificada**: Código optimizado y limpio
+- **📁 Estructura Data Warehouse**: Tablas fact separadas (`fact_expenses`, `fact_expense_orders`)
+- **🗂️ Particionado Hive-Style**: Estructura `clean/fact_*/date=YYYY-MM-DD/`
+- **🚀 Formato Parquet Optimizado**: Alto rendimiento con compresión y tipado
+- **🔐 Autenticación Segura**: Integración con Google Cloud Secret Manager
+- **🤖 Orquestador Automatizado**: `main.py` controla todo el pipeline
+- **🌩️ Sincronización GCS**: Almacenamiento automático en la nube
 - **🏗️ Arquitectura Simplificada**: Código optimizado y limpio
 - **📁 Estructura Data Warehouse**: Tablas fact separadas (`fact_expenses`, `fact_expense_orders`)
 - **🗂️ Particionado Hive-Style**: Estructura `clean/fact_*/date=YYYY-MM-DD/`
@@ -69,6 +86,29 @@ expense-extraction/
 └── README.md                   # Este archivo
 ```
 
+## Arquitectura del Sistema
+
+```
+📁 expense-extraction/
+├── main.py                     # 🎯 Orquestador principal (USAR ESTE)
+├── expense_extractor.py        # Extracción de datos desde API
+├── expense_processor.py        # Procesamiento y conversión Parquet
+├── system_summary.py           # Resumen del estado del sistema
+├── config/
+│   └── credentials.json        # Credenciales GCP
+├── utils/
+│   ├── env_config.py          # Configuración de environment
+│   ├── gcp.py                 # Utilidades Google Cloud Storage
+│   └── logger.py              # Sistema de logging unificado
+└── requirements.txt           # Dependencias Python
+```
+
+**Archivos principales optimizados**:
+- **main.py** (311 líneas): Interfaz CLI unificada
+- **expense_extractor.py** (278 líneas): Extracción desde Fudo API  
+- **expense_processor.py** (296 líneas): Conversión a formato Parquet
+- **utils/gcp.py** (121 líneas): Operaciones Google Cloud Storage
+
 ## Instalación
 
 1. **Clonar el repositorio**:
@@ -108,16 +148,19 @@ cp .env.example .env
 ```env
 # Google Cloud
 GCP_PROJECT_ID=tu-proyecto-gcp-id
+GCP_PROJECT_NAME=tu-proyecto-gcp
+GCS_BUCKET_NAME=tu-bucket-name
 GOOGLE_APPLICATION_CREDENTIALS=config/credentials.json
 
-# Fudo API (almacenados en Google Cloud Secret Manager)
-# fudo-api-key: Tu API key de Fudo
-# fudo-api-secret: Tu API secret de Fudo
-
-# Configuración de extracción
-EXPENSE_EXTRACTION_MODE=maintenance
-EXPENSE_START_ID=500
+# Configuración para ambiente
+ENV=local
 ```
+
+### Secretos en Google Cloud Secret Manager
+
+El sistema requiere los siguientes secretos configurados en Secret Manager:
+- **`fudo-api-key`**: Tu API key de Fudo
+- **`fudo-api-secret`**: Tu API secret de Fudo
 
 ## Uso del Sistema
 
@@ -292,21 +335,21 @@ processor.process_range(1, 20)
 
 ## Optimizaciones del Sistema
 
-- **28% Reducción de Código**: De 973 a 698 líneas manteniendo funcionalidad completa
-- **Arquitectura Simplificada**: Eliminación de código duplicado y no utilizado
-- **Sistema de Logging**: Prevención automática de duplicados
-- **Scripts CLI Mejorados**: Interfaces más simples y directas
-- **Estructura Data Warehouse**: Separación clara de tablas fact
-- **🎯 Orquestador Automatizado**: `main.py` - Control completo del pipeline
-- **Formato Parquet Optimizado**: 
+- **🏗️ Arquitectura Simplificada**: Eliminación de scripts redundantes y código duplicado
+- **🎯 Orquestador Centralizado**: `main.py` controla todo el pipeline automatizado
+- **📋 Sistema de Logging**: Prevención automática de duplicados con seguimiento de IDs
+- **🔧 Validación Unificada**: Funciones reutilizables para validación de rangos
+- **📚 Documentación Actualizada**: README coherente con estado actual
+- **🚀 Formato Parquet Optimizado**: 
   - Compresión automática para menor uso de espacio
   - Tipado de datos optimizado para consultas rápidas
   - Compatible con herramientas de análisis modernas (Pandas, Spark, etc.)
   - Metadatos incluidos para mejor rendimiento
+  - Sincronización automática con Google Cloud Storage
 
 ## 🎯 Orquestador Principal (main.py)
 
-El nuevo orquestador `main.py` es la **forma recomendada** de usar el sistema. Automatiza completamente el flujo de extracción, procesamiento y almacenamiento.
+El orquestador `main.py` es la **interfaz principal** del sistema. Automatiza completamente el flujo de extracción, procesamiento y almacenamiento, reemplazando los scripts manuales anteriores.
 
 ### Características del Orquestador:
 

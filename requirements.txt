@@ -1,5 +1,5 @@
 # Expense Extraction & Processing System - Dependencies
-# Optimized requirements for the simplified architecture
+# Optimized for automated pipeline with GCS integration
 
 # Core data processing
 pandas>=2.0.0                    # DataFrame processing and Parquet generation
@@ -16,9 +16,11 @@ google-auth>=2.23.0              # GCP authentication
 pytz>=2023.3                     # Timezone conversions (America/Bogota)
 
 # Note: Standard library modules used (no additional requirements):
+# - argparse (CLI argument parsing for main.py)
 # - json (JSON processing)
 # - os (file system operations) 
 # - sys (command line arguments)
+# - time (delays and timing in orchestrator)
 # - logging (application logging)
 # - datetime (date/time handling)
-# - pathlib (path operations)
+# - typing (type hints)
