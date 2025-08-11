@@ -3,11 +3,11 @@ steps:
     args: [
       'build',
       '-t',
-      'us-east1-docker.pkg.dev/$PROJECT_ID/resto-backend/dimension-extraction-cloudrun:${_VERSION_TAG}',
+      'us-east1-docker.pkg.dev/$PROJECT_ID/resto-backend/expense-extraction-cloudrun:${_VERSION_TAG}',
       '.'
     ]
 images:
-  - 'us-east1-docker.pkg.dev/$PROJECT_ID/resto-backend/dimension-extraction-cloudrun:${_VERSION_TAG}'
+  - 'us-east1-docker.pkg.dev/$PROJECT_ID/resto-backend/expense-extraction-cloudrun:${_VERSION_TAG}'
 
 options:
   logging: CLOUD_LOGGING_ONLY
