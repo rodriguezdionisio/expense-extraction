@@ -73,8 +73,6 @@ def system_summary():
         print(f"  ❌ Error consultando GCS: {e}")
     
     print("\n⚙️  CONFIGURACIÓN DEL SISTEMA:")
-    print(f"  - Modo extracción: {config.EXPENSE_EXTRACTION_MODE}")
-    print(f"  - ID inicio: {config.EXPENSE_START_ID}")
     print(f"  - Proyecto GCP: {config.GCP_PROJECT_ID}")
     print(f"  - Credenciales: {config.GOOGLE_APPLICATION_CREDENTIALS}")
     

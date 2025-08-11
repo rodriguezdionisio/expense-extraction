@@ -53,6 +53,7 @@ expense-extraction/
 │       └── ...
 ├── logs/                        # Sistema de logging para duplicados
 │   └── extracted_expenses_log.txt
+├── main.py                     # 🎯 ORQUESTADOR PRINCIPAL
 ├── expense_extractor.py         # Sistema de extracción optimizado
 ├── expense_processor.py         # Sistema de procesamiento optimizado
 ├── run_extraction.py           # Script CLI para extracción
@@ -113,9 +114,49 @@ EXPENSE_START_ID=500
 
 ## Uso del Sistema
 
-### 1. Extracción de Datos
+### 🎯 Orquestador Principal (Recomendado)
 
-El sistema optimizado incluye prevención automática de duplicados mediante sistema de logging.
+El nuevo archivo `main.py` automatiza todo el flujo de extracción, procesamiento y almacenamiento:
+
+#### Procesamiento Automático del Próximo Lote
+```bash
+# Procesa automáticamente los próximos 10 IDs desde donde se quedó
+python main.py auto
+
+# Procesa automáticamente lote de tamaño personalizado
+python main.py auto --batch-size 20
+```
+
+#### Procesamiento de Rango Específico
+```bash
+# Pipeline completo: extracción + procesamiento + almacenamiento
+python main.py range 1 20
+
+# Un solo expense
+python main.py range 25 25
+```
+
+#### Procesamiento Continuo Automatizado
+```bash
+# Procesamiento continuo con lotes de 10, pausa de 60 segundos
+python main.py continuous
+
+# Procesamiento continuo personalizado
+python main.py continuous --batch-size 20 --delay 30 --max-batches 5
+```
+
+#### Operaciones Individuales
+```bash
+# Solo extracción (sin procesamiento)
+python main.py extract 1 20
+
+# Solo procesamiento (sin extracción)
+python main.py process 1 20
+```
+
+### 1. Extracción de Datos (Método Manual)
+
+Para casos específicos donde se necesite control granular:
 
 #### Extracción por Rango
 ```bash
@@ -129,7 +170,7 @@ python run_extraction.py 25 25
 python run_extraction.py 21 40
 ```
 
-### 2. Procesamiento a CSV
+### 2. Procesamiento a Parquet (Método Manual)
 
 #### Procesamiento por Rango (Recomendado)
 ```bash
@@ -143,7 +184,20 @@ python run_processing.py 25 25
 python run_processing.py 21 40
 ```
 
-### 3. Flujo Completo Típico
+### 3. Flujo Completo Automatizado (Recomendado)
+
+```bash
+# 🚀 MÉTODO RECOMENDADO: Un solo comando para todo
+python main.py auto
+
+# O para casos específicos:
+python main.py range 1 20
+
+# Para procesamiento continuo:
+python main.py continuous --batch-size 10 --delay 30
+```
+
+### 4. Flujo Manual (Para Control Granular)
 
 ```bash
 # 1. Extraer datos desde API
@@ -288,11 +342,65 @@ processor.process_range(1, 20)
 - **Sistema de Logging**: Prevención automática de duplicados
 - **Scripts CLI Mejorados**: Interfaces más simples y directas
 - **Estructura Data Warehouse**: Separación clara de tablas fact
+- **🎯 Orquestador Automatizado**: `main.py` - Control completo del pipeline
 - **Formato Parquet Optimizado**: 
   - Compresión automática para menor uso de espacio
   - Tipado de datos optimizado para consultas rápidas
   - Compatible con herramientas de análisis modernas (Pandas, Spark, etc.)
   - Metadatos incluidos para mejor rendimiento
+
+## 🎯 Orquestador Principal (main.py)
+
+El nuevo orquestador `main.py` es la **forma recomendada** de usar el sistema. Automatiza completamente el flujo de extracción, procesamiento y almacenamiento.
+
+### Características del Orquestador:
+
+- **🤖 Automatización Completa**: Un solo comando ejecuta todo el pipeline
+- **📊 Detección Inteligente**: Identifica automáticamente el próximo lote a procesar
+- **🔄 Procesamiento Continuo**: Soporte para ejecución tipo daemon
+- **⚠️ Manejo de Errores**: Control robusto de errores y logging detallado
+- **🎛️ Flexibilidad**: Múltiples modos de operación según necesidades
+
+### Comandos Principales:
+
+```bash
+# 🚀 RECOMENDADO: Procesamiento automático
+python main.py auto                    # Próximos 10 IDs automáticamente
+python main.py auto --batch-size 20    # Lote personalizado
+
+# 📊 Rango específico  
+python main.py range 1 50              # Pipeline completo para IDs 1-50
+
+# 🔄 Procesamiento continuo (producción)
+python main.py continuous              # Lotes de 10, pausa 60 segundos
+python main.py continuous --batch-size 15 --delay 30 --max-batches 5
+
+# ⚙️ Operaciones individuales
+python main.py extract 1 100           # Solo extracción
+python main.py process 1 100           # Solo procesamiento
+```
+
+### Casos de Uso del Orquestador:
+
+1. **Procesamiento Inicial Masivo**:
+   ```bash
+   python main.py range 1 1000
+   ```
+
+2. **Mantenimiento Diario Automatizado**:
+   ```bash
+   python main.py auto --batch-size 50
+   ```
+
+3. **Procesamiento Continuo (Servidor)**:
+   ```bash
+   python main.py continuous --batch-size 20 --delay 300
+   ```
+
+4. **Testing y Desarrollo**:
+   ```bash
+   python main.py continuous --batch-size 3 --delay 10 --max-batches 2
+   ```
 
 ## Ventajas del Formato Parquet
 

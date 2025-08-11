@@ -8,6 +8,7 @@ requests>=2.31.0                 # HTTP requests to Fudo API
 python-dotenv>=1.0.0             # Environment variables management
 
 # Google Cloud integration
+google-cloud-storage>=2.10.0    # Google Cloud Storage client
 google-cloud-secret-manager>=2.16.0  # Secure API credentials storage
 google-auth>=2.23.0              # GCP authentication
 

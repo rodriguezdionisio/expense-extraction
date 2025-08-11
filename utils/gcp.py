@@ -1,7 +1,6 @@
 import pandas as pd
 from google.cloud import storage, secretmanager
 from google.oauth2 import service_account
-import gcsfs
 from utils.env_config import config
 from utils.logger import get_logger
 
@@ -121,30 +120,3 @@ def get_secret(secret_id: str) -> str:
     except Exception as e:
         logger.error(f"Error al acceder al secreto '{secret_id}': {e}")
         return ""
-
-def get_gcsfs():
-    """
-    Retorna una instancia de GCSFileSystem, usando el archivo de credenciales si está definido.
-    """
-    if config.GOOGLE_APPLICATION_CREDENTIALS:
-        return gcsfs.GCSFileSystem(token=config.GOOGLE_APPLICATION_CREDENTIALS)
-    return gcsfs.GCSFileSystem()
-
-def list_gcs_files(bucket: str, prefix: str) -> list[str]:
-    """
-    Lista archivos en GCS con un prefijo determinado usando gcsfs.
-
-    Args:
-        bucket (str): Nombre del bucket (sin 'gs://').
-        prefix (str): Prefijo de los archivos a listar.
-
-    Returns:
-        list[str]: Lista de rutas de archivos en GCS que coinciden con el prefijo.
-    """
-    fs = get_gcsfs()
-    path = f"gs://{bucket}/{prefix}"
-    try:
-        return fs.ls(path)
-    except Exception as e:
-        logger.error(f"gcs_utils: Error al listar archivos en {path}: {e}")
-        return []
