@@ -85,12 +85,13 @@ def system_summary():
     print("  ✅ Formato Parquet optimizado")
     print("  ✅ Estructura data warehouse")
     print("  ✅ Sincronización automática a GCS")
+    print("  ✅ Orquestador automatizado")
     
     print("\n🎯 COMANDOS PRINCIPALES:")
-    print("  python run_extraction.py <start_id> <end_id>  # Extraer rango")
-    print("  python run_processing.py <start_id> <end_id>  # Procesar rango")
+    print("  python main.py auto                           # Próximo lote automático")
+    print("  python main.py range <start_id> <end_id>      # Procesar rango específico")
+    print("  python main.py continuous                     # Procesamiento continuo")
     print("  python verify_expense_gcs.py                  # Verificar GCS")
-    print("  python verify_sync.py                         # Verificar sync")
     
     print(f"\n✅ SISTEMA LISTO PARA PRODUCCIÓN")
 

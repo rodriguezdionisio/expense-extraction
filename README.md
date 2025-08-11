@@ -1,4 +1,11 @@
-# Expense - **📊 Extracción Inteligente**: Sistema con logging para prevenir duplicados automáticamente
+# Expense - **📊 - **📊 Extracción Inteligente**: Sistema con logging para prevenir duplicados automáticamente
+- **🏗️ Arquitectura Simplificada**: Código optimizado y limpio
+- **📁 Estructura Data Warehouse**: Tablas fact separadas (`fact_expenses`, `fact_expense_orders`)
+- **🗂️ Particionado Hive-Style**: Estructura `clean/fact_*/date=YYYY-MM-DD/`
+- **🚀 Formato Parquet Optimizado**: Alto rendimiento con compresión y tipado
+- **🔐 Autenticación Segura**: Integración con Google Cloud Secret Manager
+- **🤖 Orquestador Automatizado**: `main.py` controla todo el pipeline
+- **🌩️ Sincronización GCS**: Almacenamiento automático en la nubeión Inteligente**: Sistema con logging para prevenir duplicados automáticamente
 - **🏗️ Arquitectura Simplificada**: Código optimizado reducido en 28% manteniendo funcionalidad completa
 - **📁 Estructura Data Warehouse**: Tablas fact separadas (`fact_expenses`, `fact_expense_orders`)
 - **🗂️ Particionado Hive-Style**: Estructura `clean/fact_*/date=YYYY-MM-DD/`
@@ -56,8 +63,8 @@ expense-extraction/
 ├── main.py                     # 🎯 ORQUESTADOR PRINCIPAL
 ├── expense_extractor.py         # Sistema de extracción optimizado
 ├── expense_processor.py         # Sistema de procesamiento optimizado
-├── run_extraction.py           # Script CLI para extracción
-├── run_processing.py           # Script CLI para procesamiento
+├── system_summary.py           # Resumen del sistema
+├── verify_expense_gcs.py       # Verificación de GCS
 ├── requirements.txt            # Dependencias
 └── README.md                   # Este archivo
 ```
@@ -154,63 +161,6 @@ python main.py extract 1 20
 python main.py process 1 20
 ```
 
-### 1. Extracción de Datos (Método Manual)
-
-Para casos específicos donde se necesite control granular:
-
-#### Extracción por Rango
-```bash
-# Extraer IDs específicos (ej: primeros 20)
-python run_extraction.py 1 20
-
-# Extraer un solo ID
-python run_extraction.py 25 25
-
-# Extraer siguiente lote
-python run_extraction.py 21 40
-```
-
-### 2. Procesamiento a Parquet (Método Manual)
-
-#### Procesamiento por Rango (Recomendado)
-```bash
-# Procesar los mismos IDs extraídos (ej: 1-20)
-python run_processing.py 1 20
-
-# Procesar un solo expense
-python run_processing.py 25 25
-
-# Procesar lote completo
-python run_processing.py 21 40
-```
-
-### 3. Flujo Completo Automatizado (Recomendado)
-
-```bash
-# 🚀 MÉTODO RECOMENDADO: Un solo comando para todo
-python main.py auto
-
-# O para casos específicos:
-python main.py range 1 20
-
-# Para procesamiento continuo:
-python main.py continuous --batch-size 10 --delay 30
-```
-
-### 4. Flujo Manual (Para Control Granular)
-
-```bash
-# 1. Extraer datos desde API
-python run_extraction.py 1 20
-
-# 2. Procesar a tablas fact
-python run_processing.py 1 20
-
-# 3. Continuar con siguiente lote
-python run_extraction.py 21 40
-python run_processing.py 21 40
-```
-
 ## Estructura de Archivos de Salida
 
 ### Estructura Data Warehouse
@@ -227,25 +177,30 @@ clean/
 │   └── ...
 └── fact_expense_orders/        # Tabla de órdenes/items
     ├── date=2019-10-27/
-    │   └── fact_expense_orders.csv
+    │   └── fact_expense_orders.parquet
     ├── date=2020-01-04/
-    │   └── fact_expense_orders.csv
+    │   └── fact_expense_orders.parquet
     └── ...
 ```
 
-### Archivos CSV Generados
+### Archivos Parquet Generados
 
-#### `fact_expenses.csv` - Datos principales de gastos
-```csv
-expense_key,expense_amount,cancelled,expense_date_key,payment_date_key,due_date_key,created_date_key,created_time_key,expense_note,receipt_number,use_in_cash_count,cashregister_key,paymentmethod_key,provider_key,receipttype_key,user_key
-1,1500.0,False,20200104,20200110,20200115,20200104,1430,Compra materiales,001-123,True,1,2,45,1,7
-```
+#### `fact_expenses.parquet` - Datos principales de gastos
+Columnas optimizadas con tipos de datos eficientes:
+- `expense_key` (int64): Clave primaria del gasto
+- `expense_amount` (float64): Monto del gasto
+- `cancelled` (bool): Estado de cancelación
+- `expense_date_key` (int64): Fecha del gasto (YYYYMMDD)
+- `created_date_key`, `created_time_key` (int64): Fechas y hora de creación
+- Claves foráneas: `cashregister_key`, `paymentmethod_key`, `provider_key`, etc.
 
-#### `fact_expense_orders.csv` - Líneas de detalle (expense items)
-```csv
-expense_order_key,expense_key,cancelled,item_detail,item_price,item_quantity,product_key,product_name,product_cost,product_unit,ingredient_key,ingredient_name,ingredient_cost,ingredient_unit
-456,1,False,Harina 000,850.0,2.0,789,Harina 000 x 1kg,800.0,kg,101,Harina 000,800.0,kg
-```
+#### `fact_expense_orders.parquet` - Líneas de detalle (expense items)
+Columnas optimizadas para análisis de items:
+- `expense_order_key` (int64): Clave primaria del item
+- `expense_key` (int64): Clave foránea al expense principal
+- `item_detail` (string): Descripción del item
+- `item_price`, `item_quantity` (float64): Precio y cantidad
+- Datos de productos e ingredientes con prefijos optimizados
 
 ## Transformaciones Aplicadas
 

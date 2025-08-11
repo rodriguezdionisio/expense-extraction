@@ -210,6 +210,23 @@ class ExpenseOrchestrator:
         print(f"📊 Total de lotes procesados: {batch_count}")
 
 
+def validate_id_range(start_id: int, end_id: int) -> bool:
+    """
+    Valida que los IDs estén en un rango válido.
+    
+    Args:
+        start_id: ID inicial
+        end_id: ID final
+        
+    Returns:
+        True si el rango es válido
+    """
+    if start_id <= 0 or end_id <= 0 or start_id > end_id:
+        print("❌ Error: IDs deben ser positivos y start_id <= end_id")
+        return False
+    return True
+
+
 def main():
     """Función principal con interfaz de línea de comandos."""
     parser = argparse.ArgumentParser(description="Orquestador de expenses - Extracción, Procesamiento y Almacenamiento")
@@ -253,8 +270,7 @@ def main():
     try:
         if args.command == 'range':
             # Validar rango
-            if args.start_id <= 0 or args.end_id <= 0 or args.start_id > args.end_id:
-                print("❌ Error: IDs deben ser positivos y start_id <= end_id")
+            if not validate_id_range(args.start_id, args.end_id):
                 sys.exit(1)
             
             success = orchestrator.run_full_pipeline(args.start_id, args.end_id)
@@ -268,16 +284,14 @@ def main():
             orchestrator.run_continuous(args.batch_size, args.max_batches, args.delay)
         
         elif args.command == 'extract':
-            if args.start_id <= 0 or args.end_id <= 0 or args.start_id > args.end_id:
-                print("❌ Error: IDs deben ser positivos y start_id <= end_id")
+            if not validate_id_range(args.start_id, args.end_id):
                 sys.exit(1)
             
             success, count = orchestrator.extract_batch(args.start_id, args.end_id)
             sys.exit(0 if success else 1)
         
         elif args.command == 'process':
-            if args.start_id <= 0 or args.end_id <= 0 or args.start_id > args.end_id:
-                print("❌ Error: IDs deben ser positivos y start_id <= end_id")
+            if not validate_id_range(args.start_id, args.end_id):
                 sys.exit(1)
             
             success = orchestrator.process_batch(args.start_id, args.end_id)
