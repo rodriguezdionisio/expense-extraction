@@ -92,14 +92,15 @@ class ExpenseProcessor:
             
             # Agregar relaciones
             for rel_name, rel_type in [
-                ('cashRegister', 'cashRegister'),
-                ('paymentMethod', 'paymentMethod'),
-                ('provider', 'provider'),
-                ('receiptType', 'receiptType'),
-                ('user', 'user')
+                ('cashRegister', 'CashRegister'),
+                ('paymentMethod', 'PaymentMethod'),
+                ('provider', 'Provider'),
+                ('receiptType', 'ReceiptType'),
+                ('user', 'User')
             ]:
                 rel_data = self._extract_relationships(relationships, included, rel_name, rel_type)
                 expense[f'{rel_name.lower()}_key'] = int(rel_data.get(f'{rel_name.lower()}_id', 0))
+                expense[f'{rel_name.lower()}_name'] = str(rel_data.get(f'{rel_name.lower()}_name', ''))
             
             # Expense items
             items = []
