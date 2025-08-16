@@ -214,12 +214,30 @@ class ExpenseProcessor:
                     else:
                         combined_items = date_items
                 else:
-                    # Crear archivo vacío con headers
+                    # Crear archivo vacío con headers y datatypes específicos
                     combined_items = pd.DataFrame(columns=[
                         'expense_order_key', 'expense_key', 'cancelled', 'item_detail', 'item_price',
                         'item_quantity', 'product_key', 'product_name', 'product_cost', 'product_unit',
                         'ingredient_key', 'ingredient_name', 'ingredient_cost', 'ingredient_unit'
                     ])
+                    
+                    # Forzar datatypes específicos para archivos vacíos
+                    combined_items = combined_items.astype({
+                        'expense_order_key': 'object',
+                        'expense_key': 'object', 
+                        'cancelled': 'bool',  # Forzar boolean para consistencia
+                        'item_detail': 'object',
+                        'item_price': 'float64',
+                        'item_quantity': 'float64',
+                        'product_key': 'object',
+                        'product_name': 'object',
+                        'product_cost': 'float64',
+                        'product_unit': 'object',
+                        'ingredient_key': 'object',
+                        'ingredient_name': 'object', 
+                        'ingredient_cost': 'float64',
+                        'ingredient_unit': 'object'
+                    })
                 
                 # Guardar items localmente
                 combined_items.to_parquet(items_file, index=False, engine='pyarrow')

@@ -10,3 +10,17 @@ raw_data/
 clean/
 raw/
 logs/
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Local Parquet files
+clean/
+
+# Test files
+test_*.py
+*_test.py
+tests/

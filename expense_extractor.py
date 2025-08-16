@@ -56,8 +56,13 @@ class ExpenseExtractor:
             # Continuar sin fallar si GCS no está disponible
     
     def get_extracted_ids(self) -> set:
-        """Obtiene la lista de IDs ya extraídos desde el archivo de log."""
+        """Obtiene la lista de IDs ya extraídos desde GCS o archivo de log local."""
         try:
+            # Primero intentar descargar desde GCS
+            if self._sync_log_from_gcs():
+                logger.debug("📥 Log sincronizado desde GCS")
+            
+            # Leer archivo local (ya sea descargado de GCS o existente)
             if os.path.exists(EXTRACTED_LOG_FILE):
                 with open(EXTRACTED_LOG_FILE, 'r') as f:
                     return {int(line.strip()) for line in f if line.strip().isdigit()}
@@ -66,36 +71,82 @@ class ExpenseExtractor:
             logger.warning(f"Error leyendo archivo de log: {e}")
             return set()
     
-    def log_extracted_id(self, expense_id: int):
-        """Registra un ID como extraído en el archivo de log local y en GCS."""
+    def _sync_log_from_gcs(self) -> bool:
+        """Descarga el log desde GCS si existe y es más reciente."""
         from utils.gcp import get_storage_client
         from utils.env_config import config
         
+        try:
+            client = get_storage_client()
+            if not client:
+                logger.debug("No se pudo conectar a GCS para descargar log")
+                return False
+            
+            bucket = client.bucket(config.GCS_BUCKET_NAME)
+            gcs_log_path = "logs/extracted_expenses_log.txt"
+            blob = bucket.blob(gcs_log_path)
+            
+            # Verificar si el blob existe
+            if not blob.exists():
+                logger.debug("Log no existe en GCS, usando archivo local")
+                return False
+            
+            # Verificar si el archivo local existe y comparar fechas
+            if os.path.exists(EXTRACTED_LOG_FILE):
+                local_mtime = os.path.getmtime(EXTRACTED_LOG_FILE)
+                gcs_mtime = blob.updated.timestamp() if blob.updated else 0
+                
+                # Si el archivo local es más reciente, no descargar
+                if local_mtime >= gcs_mtime:
+                    logger.debug("Archivo local es más reciente que GCS")
+                    return False
+            
+            # Descargar desde GCS
+            blob.download_to_filename(EXTRACTED_LOG_FILE)
+            logger.info(f"📥 Log descargado desde GCS: {gcs_log_path}")
+            return True
+            
+        except Exception as e:
+            logger.warning(f"Error descargando log desde GCS: {e}")
+            return False
+    
+    def log_extracted_id(self, expense_id: int):
+        """Registra un ID como extraído en el archivo de log local y en GCS."""
         try:
             # Guardar localmente
             with open(EXTRACTED_LOG_FILE, 'a') as f:
                 f.write(f"{expense_id}\n")
             
             # Subir a GCS
-            try:
-                client = get_storage_client()
-                if client:
-                    bucket = client.bucket(config.GCS_BUCKET_NAME)
-                    gcs_log_path = "logs/extracted_expenses_log.txt"
-                    blob = bucket.blob(gcs_log_path)
-                    
-                    with open(EXTRACTED_LOG_FILE, 'rb') as f:
-                        blob.upload_from_file(f, content_type='text/plain')
-                    
-                    logger.debug(f"🌩️  Log actualizado en GCS: {gcs_log_path}")
-                else:
-                    logger.warning("No se pudo conectar a GCS para subir log")
-            except Exception as gcs_error:
-                logger.error(f"Error subiendo log a GCS: {gcs_error}")
-                # Continuar sin fallar si GCS falla
+            self._upload_log_to_gcs()
                 
         except Exception as e:
             logger.error(f"Error escribiendo en el log: {e}")
+    
+    def _upload_log_to_gcs(self):
+        """Sube el archivo de log a GCS."""
+        from utils.gcp import get_storage_client
+        from utils.env_config import config
+        
+        try:
+            client = get_storage_client()
+            if not client:
+                logger.warning("No se pudo conectar a GCS para subir log")
+                return False
+            
+            bucket = client.bucket(config.GCS_BUCKET_NAME)
+            gcs_log_path = "logs/extracted_expenses_log.txt"
+            blob = bucket.blob(gcs_log_path)
+            
+            with open(EXTRACTED_LOG_FILE, 'rb') as f:
+                blob.upload_from_file(f, content_type='text/plain')
+            
+            logger.debug(f"🌩️  Log actualizado en GCS: {gcs_log_path}")
+            return True
+            
+        except Exception as gcs_error:
+            logger.error(f"Error subiendo log a GCS: {gcs_error}")
+            return False
     
     def filter_unextracted_ids(self, start_id: int, end_id: int) -> List[int]:
         """Filtra los IDs que aún no han sido extraídos."""
@@ -110,7 +161,17 @@ class ExpenseExtractor:
         return unextracted_ids
 
     def initialize_log_from_existing_files(self):
-        """Inicializa el log con los IDs de archivos ya existentes en raw/."""
+        """Inicializa el log con los IDs de archivos ya existentes en raw/ y sincroniza con GCS."""
+        # Primero intentar sincronizar desde GCS
+        if self._sync_log_from_gcs():
+            logger.info("📋 Log sincronizado desde GCS")
+            # Verificar si ya tenemos IDs en el log
+            existing_ids_from_log = self.get_extracted_ids()
+            if existing_ids_from_log:
+                logger.info(f"📋 Log ya contiene {len(existing_ids_from_log)} IDs: {min(existing_ids_from_log)}-{max(existing_ids_from_log)}")
+                return
+        
+        # Si el log ya existe localmente, no sobrescribirlo
         if os.path.exists(EXTRACTED_LOG_FILE):
             logger.info("📋 Archivo de log ya existe, no es necesario inicializar")
             return
@@ -121,6 +182,10 @@ class ExpenseExtractor:
         
         if not existing_files:
             logger.info("📋 No hay archivos existentes, log inicializado vacío")
+            # Crear archivo vacío y subirlo a GCS
+            with open(EXTRACTED_LOG_FILE, 'w') as f:
+                pass  # Archivo vacío
+            self._upload_log_to_gcs()
             return
         
         existing_ids = []
@@ -138,7 +203,10 @@ class ExpenseExtractor:
             for expense_id in existing_ids:
                 f.write(f"{expense_id}\n")
         
-        logger.info(f"📋 Log inicializado con {len(existing_ids)} IDs existentes: {min(existing_ids)}-{max(existing_ids)}")
+        # Subir a GCS
+        self._upload_log_to_gcs()
+        
+        logger.info(f"📋 Log inicializado con {len(existing_ids)} IDs existentes: {min(existing_ids)}-{max(existing_ids)} y sincronizado con GCS")
     
     def get_token(self) -> str:
         """Obtiene el token de autenticación desde la API de Fudo."""
