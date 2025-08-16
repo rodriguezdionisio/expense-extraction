@@ -41,7 +41,8 @@ class ExpenseProcessor:
             return {}
         
         key = f"{rel_type}_{rel_id}"
-        attrs = included.get(key, {})
+        item_data = included.get(key, {})
+        attrs = item_data.get('attributes', {})
         
         return {f'{rel_name.lower()}_id': rel_id, **{f'{rel_name.lower()}_{k}': v for k, v in attrs.items()}}
     
@@ -51,11 +52,14 @@ class ExpenseProcessor:
             data = expense_data.get('data', {})
             included_raw = expense_data.get('included', [])
             
-            # Organizar included por tipo_id
+            # Organizar included por tipo_id - manteniendo estructura completa
             included = {}
             for item in included_raw:
                 key = f"{item.get('type', '')}_{item.get('id', '')}"
-                included[key] = item.get('attributes', {})
+                included[key] = {
+                    'attributes': item.get('attributes', {}),
+                    'relationships': item.get('relationships', {})
+                }
             
             attrs = data.get('attributes', {})
             relationships = data.get('relationships', {})
@@ -93,6 +97,7 @@ class ExpenseProcessor:
             # Agregar relaciones
             for rel_name, rel_type in [
                 ('cashRegister', 'CashRegister'),
+                ('expenseCategory', 'ExpenseCategory'),
                 ('paymentMethod', 'PaymentMethod'),
                 ('provider', 'Provider'),
                 ('receiptType', 'ReceiptType'),
@@ -111,7 +116,9 @@ class ExpenseProcessor:
                 if not item_id:
                     continue
                     
-                item_attrs = included.get(f"expenseItem_{item_id}", {})
+                item_data = included.get(f"ExpenseItem_{item_id}", {})
+                item_attrs = item_data.get('attributes', {})
+                item_relationships = item_data.get('relationships', {})
                 
                 item = {
                     'expense_order_key': int(item_id),
@@ -130,16 +137,45 @@ class ExpenseProcessor:
                     'ingredient_unit': ''
                 }
                 
-                # Buscar producto o ingrediente
-                for rel_name, rel_type in [('product', 'product'), ('ingredient', 'ingredient')]:
-                    if rel_name in item_attrs:
-                        rel_id = item_attrs[rel_name]
-                        rel_attrs = included.get(f"{rel_type}_{rel_id}", {})
-                        if rel_attrs:
-                            item[f'{rel_name}_key'] = int(rel_id)
-                            item[f'{rel_name}_name'] = str(rel_attrs.get('name', ''))
-                            item[f'{rel_name}_cost'] = float(rel_attrs.get('cost', 0.0))
-                            item[f'{rel_name}_unit'] = str(rel_attrs.get('unit', ''))
+                # Extraer información de producto
+                product_ref = item_relationships.get('product', {}).get('data')
+                if product_ref and product_ref.get('id'):
+                    product_id = product_ref.get('id')
+                    product_data = included.get(f"Product_{product_id}", {})
+                    product_attrs = product_data.get('attributes', {})
+                    product_relationships = product_data.get('relationships', {})
+                    
+                    item['product_key'] = int(product_id)
+                    item['product_name'] = str(product_attrs.get('name', ''))
+                    item['product_cost'] = float(product_attrs.get('cost') or 0.0)
+                    
+                    # Extraer unidad del producto
+                    unit_ref = product_relationships.get('unit', {}).get('data')
+                    if unit_ref and unit_ref.get('id'):
+                        unit_id = unit_ref.get('id')
+                        unit_data = included.get(f"Unit_{unit_id}", {})
+                        unit_attrs = unit_data.get('attributes', {})
+                        item['product_unit'] = str(unit_attrs.get('name', ''))
+                
+                # Extraer información de ingrediente
+                ingredient_ref = item_relationships.get('ingredient', {}).get('data')
+                if ingredient_ref and ingredient_ref.get('id'):
+                    ingredient_id = ingredient_ref.get('id')
+                    ingredient_data = included.get(f"Ingredient_{ingredient_id}", {})
+                    ingredient_attrs = ingredient_data.get('attributes', {})
+                    ingredient_relationships = ingredient_data.get('relationships', {})
+                    
+                    item['ingredient_key'] = int(ingredient_id)
+                    item['ingredient_name'] = str(ingredient_attrs.get('name', ''))
+                    item['ingredient_cost'] = float(ingredient_attrs.get('cost') or 0.0)
+                    
+                    # Extraer unidad del ingrediente
+                    unit_ref = ingredient_relationships.get('unit', {}).get('data')
+                    if unit_ref and unit_ref.get('id'):
+                        unit_id = unit_ref.get('id')
+                        unit_data = included.get(f"Unit_{unit_id}", {})
+                        unit_attrs = unit_data.get('attributes', {})
+                        item['ingredient_unit'] = str(unit_attrs.get('name', ''))
                 
                 items.append(item)
             
